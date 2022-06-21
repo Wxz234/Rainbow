@@ -7,6 +7,10 @@ add_library(RainbowCore STATIC Core/Core.cpp)
 target_include_directories(RainbowCore PRIVATE "Include")
 target_compile_definitions(RainbowCore PRIVATE UNICODE _UNICODE)
 
+add_library(RainbowRuntime STATIC Runtime/Runtime.cpp)
+target_include_directories(RainbowRuntime PRIVATE "Include")
+target_compile_definitions(RainbowRuntime PRIVATE UNICODE _UNICODE)
+
 add_executable(RainbowEditor WIN32 Editor/Editor.cpp)
 target_include_directories(RainbowEditor PRIVATE "Include")
 target_compile_definitions(RainbowEditor PRIVATE UNICODE _UNICODE)
