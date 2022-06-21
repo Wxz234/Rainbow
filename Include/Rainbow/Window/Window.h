@@ -13,4 +13,12 @@ namespace Rainbow {
 	struct WindowHandle {
 		void* window;
 	};
+
+	class IWindow {
+	public:
+		virtual bool Init() = 0;
+		virtual void Exit() = 0;
+		virtual void Update(float deltaTime) = 0;
+		virtual void Draw() = 0;
+	};
 }
