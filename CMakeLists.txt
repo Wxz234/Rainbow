@@ -8,3 +8,4 @@ target_include_directories(RainbowCore PRIVATE "Include")
 
 add_executable(RainbowEditor WIN32 Editor/Editor.cpp)
 target_include_directories(RainbowEditor PRIVATE "Include")
+target_compile_definitions(RainbowEditor PRIVATE UNICODE _UNICODE)
