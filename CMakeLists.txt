@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_library(RainbowCore STATIC Core/Core.cpp)
 target_include_directories(RainbowCore PRIVATE "Include")
+target_compile_definitions(RainbowCore PRIVATE UNICODE _UNICODE)
 
 add_executable(RainbowEditor WIN32 Editor/Editor.cpp)
 target_include_directories(RainbowEditor PRIVATE "Include")
