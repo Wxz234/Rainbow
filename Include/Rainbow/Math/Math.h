@@ -20,14 +20,6 @@ namespace Rainbow {
         Vector2(Vector2&&) = default;
         Vector2& operator=(Vector2&&) = default;
 
-        void Normalize() {
-            DirectX::XMFLOAT2 temp_float2(x, y);
-            auto temp = DirectX::XMVector2Normalize(DirectX::XMLoadFloat2(&temp_float2));
-            DirectX::XMStoreFloat2(&temp_float2, temp);
-            x = temp_float2.x;
-            y = temp_float2.y;
-        }
-
         float x;
         float y;
     };
