@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "../Window/Window.h"
+
 #include <d3d12.h>
 
 namespace Rainbow {
