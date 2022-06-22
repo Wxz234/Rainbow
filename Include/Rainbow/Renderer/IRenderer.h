@@ -8,6 +8,7 @@
 #pragma once
 
 #include <d3d12.h>
+#include <string>
 
 namespace Rainbow {
 	enum PipelineType
@@ -22,9 +23,13 @@ namespace Rainbow {
 	};
 
 	struct Device {
-		ID3D12Device* pDxDevice = nullptr;
+		ID3D12Device* pDxDevice;
 	};
 
 	void CreateDevice(Device** ppDevice);
 	void RemoveDevice(Device* pDevice);
+
+	struct Material {
+		std::string name;
+	};
 }
