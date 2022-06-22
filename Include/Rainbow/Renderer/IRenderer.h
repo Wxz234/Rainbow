@@ -16,4 +16,15 @@ namespace Rainbow {
 		PIPELINE_TYPE_COMPUTE,
 		PIPELINE_TYPE_COUNT,
 	};
+
+	struct Texture {
+
+	};
+
+	struct Device {
+		ID3D12Device* pDxDevice;
+	};
+
+	void CreateDevice(Device** ppDevice);
+	void RemoveDevice(Device* pDevice);
 }
