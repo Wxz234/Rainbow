@@ -22,7 +22,7 @@ namespace Rainbow {
 	};
 
 	struct Device {
-		ID3D12Device* pDxDevice;
+		ID3D12Device* pDxDevice = nullptr;
 	};
 
 	void CreateDevice(Device** ppDevice);

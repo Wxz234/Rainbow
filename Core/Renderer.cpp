@@ -7,6 +7,10 @@
 
 #include "Rainbow/Renderer/IRenderer.h"
 
+#include <d3d12sdklayers.h>
+#include <winerror.h>
+#include <combaseapi.h>
+
 #pragma warning (disable: 6011)
 
 namespace Rainbow {
@@ -15,6 +19,15 @@ namespace Rainbow {
 			return;
 		}
 		Device* pDevice = new Device;
+#ifdef _DEBUG
+		ID3D12Debug* debugController = nullptr;
+		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+		{
+			debugController->EnableDebugLayer();
+			debugController->Release();
+		}
+
+#endif // DEBUG
 		D3D12CreateDevice(nullptr, (D3D_FEATURE_LEVEL)0xc200, __uuidof(pDevice->pDxDevice), reinterpret_cast<void**> (&pDevice->pDxDevice));
 		*ppDevice = pDevice;
 	}
