@@ -10,14 +10,14 @@
 #include <d3d12sdklayers.h>
 #include <winerror.h>
 #include <combaseapi.h>
+#include <cassert>
 
 #pragma warning (disable: 6011)
 
 namespace Rainbow {
 	void CreateDevice(Device** ppDevice) {
-		if (!ppDevice) {
-			return;
-		}
+		assert(ppDevice);
+
 		Device* pDevice = new Device;
 #ifdef _DEBUG
 		ID3D12Debug* debugController = nullptr;
@@ -33,10 +33,20 @@ namespace Rainbow {
 	}
 
 	void RemoveDevice(Device* pDevice) {
-		if (!pDevice) {
-			return;
-		}
+		assert(pDevice);
+
 		pDevice->pDxDevice->Release();
 		delete pDevice;
+	}
+
+	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture) {
+		assert(pDevice);
+		assert(pDesc);
+		assert(ppTexture);
+
+		//pDevice->pDxDevice->CreateCommittedResource()
+	}
+	void RemoveTexture(Texture* pTexture) {
+		assert(pTexture);
 	}
 }
