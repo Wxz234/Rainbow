@@ -19,6 +19,7 @@ namespace Rainbow {
 		assert(ppDevice);
 
 		Device* pDevice = new Device;
+		IDXGIFactory7* temp_factory = nullptr;
 #ifdef _DEBUG
 		ID3D12Debug* debugController = nullptr;
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
@@ -26,7 +27,7 @@ namespace Rainbow {
 			debugController->EnableDebugLayer();
 			debugController->Release();
 		}
-		IDXGIFactory7* temp_factory = nullptr;
+
 		CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&temp_factory));
 #else
 		CreateDXGIFactory2(0, IID_PPV_ARGS(&temp_factory));
