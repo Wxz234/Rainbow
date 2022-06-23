@@ -31,20 +31,17 @@ namespace Rainbow {
 	void CreateDevice(Device** ppDevice);
 	void RemoveDevice(Device* pDevice);
 
-	//struct Texture {
-	//	ID3D12Resource* pDxResource;
-	//};
+	struct Texture {
+		ID3D12Resource* pDxResource;
+		D3D12MA::Allocation* pDxAllocation;
+	};
 
-	//struct TextureDesc {
-	//	DXGI_FORMAT Format;
-	//	uint64_t Width;
-	//	uint32_t Height;
-	//};
+	struct TextureDesc {
+		DXGI_FORMAT Format;
+		uint64_t Width;
+		uint32_t Height;
+	};
 
-	//void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture);
-	//void RemoveTexture(Texture* pTexture);
-
-	//struct Material {
-	//	std::string name;
-	//};
+	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture);
+	void RemoveTexture(Texture* pTexture);
 }

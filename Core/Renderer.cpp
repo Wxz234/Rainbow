@@ -53,14 +53,15 @@ namespace Rainbow {
 		delete pDevice;
 	}
 
-	//void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture) {
-	//	assert(pDevice);
-	//	assert(pDesc);
-	//	assert(ppTexture);
+	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture) {
+		assert(pDevice);
+		assert(pDesc);
+		assert(ppTexture);
+
 
 	//	//pDevice->pDxDevice->CreateCommittedResource()
-	//}
-	//void RemoveTexture(Texture* pTexture) {
-	//	assert(pTexture);
-	//}
+	}
+	void RemoveTexture(Texture* pTexture) {
+		assert(pTexture);
+	}
 }
