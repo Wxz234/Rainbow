@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "../ThirdParty/D3D12MemoryAllocator/include/D3D12MemAlloc.h"
+
 #include <d3d12.h>
 #include <string>
 #include <cstdint>
