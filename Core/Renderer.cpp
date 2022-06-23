@@ -28,7 +28,7 @@ namespace Rainbow {
 		}
 
 #endif // DEBUG
-		D3D12CreateDevice(nullptr, (D3D_FEATURE_LEVEL)0xc200, __uuidof(pDevice->pDxDevice), reinterpret_cast<void**> (&pDevice->pDxDevice));
+		D3D12CreateDevice(nullptr, (D3D_FEATURE_LEVEL)0xc200, IID_PPV_ARGS(&pDevice->pDxDevice));
 		*ppDevice = pDevice;
 	}
 
