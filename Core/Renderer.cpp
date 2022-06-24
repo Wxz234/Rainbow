@@ -77,5 +77,31 @@ namespace Rainbow {
 		assert(pTexture);
 		pTexture->pDxAllocation->Release();
 		pTexture->pDxResource->Release();
+		delete pTexture;
+	}
+
+	void CreateQueue(Device* pDevice, QueueDesc* pDesc, Queue** ppQueue) {
+		assert(pDevice);
+		assert(pDesc);
+		assert(ppQueue);
+		Queue* pQueue = new Queue;
+		D3D12_COMMAND_QUEUE_DESC queueDesc{};
+		if (pDesc->mType == QUEUE_TYPE_GRAPHICS) {
+			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		}
+		else if (pDesc->mType == QUEUE_TYPE_COMPUTE) {
+			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+		}
+		else if (pDesc->mType == QUEUE_TYPE_COPY) {
+			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COPY;
+		}
+		pDevice->pDxDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&pQueue->pDxQueue));
+		*ppQueue = pQueue;
+	}
+
+	void RemoveQueue(Queue* pQueue) {
+		assert(pQueue);
+		pQueue->pDxQueue->Release();
+		delete pQueue;
 	}
 }

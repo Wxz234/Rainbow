@@ -4,3 +4,11 @@
 //
 // https://github.com/Wxz234/Rainbow
 //
+
+#pragma once
+
+namespace Rainbow {
+	struct WindowHandle {
+		void* window;
+	};
+}
