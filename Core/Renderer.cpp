@@ -10,6 +10,7 @@
 #include <d3d12sdklayers.h>
 #include <winerror.h>
 #include <combaseapi.h>
+#include <synchapi.h>
 #include <cassert>
 
 #pragma warning (disable: 6011)
@@ -96,12 +97,96 @@ namespace Rainbow {
 			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COPY;
 		}
 		pDevice->pDxDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&pQueue->pDxQueue));
+		pDevice->pDxDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pQueue->pDxFence));
+		pQueue->pDxWaitIdleFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		pQueue->mFenceValue = 1;
+		pQueue->pSubmitSwapChain = nullptr;
 		*ppQueue = pQueue;
 	}
 
 	void RemoveQueue(Queue* pQueue) {
 		assert(pQueue);
+		const uint64_t fence = pQueue->mFenceValue;
+		pQueue->pDxQueue->Signal(pQueue->pDxFence, fence);
+		if (pQueue->pDxFence->GetCompletedValue() < fence)
+		{
+			pQueue->pDxFence->SetEventOnCompletion(fence, pQueue->pDxWaitIdleFenceEvent);
+			WaitForSingleObject(pQueue->pDxWaitIdleFenceEvent, INFINITE);
+		}
+		if (pQueue->pSubmitSwapChain) {
+			pQueue->pSubmitSwapChain->Release();
+		}
+		pQueue->pDxFence->Release();
 		pQueue->pDxQueue->Release();
+		CloseHandle(pQueue->pDxWaitIdleFenceEvent);
 		delete pQueue;
+	}
+
+	void CreateSwapChain(Queue* pQueue, SwapChainDesc* pDesc, SwapChain** ppSwapChain) {
+		assert(pQueue);
+		assert(pDesc);
+		assert(ppSwapChain);
+		SwapChain* pSwapChain = new SwapChain;
+
+		DXGI_SWAP_CHAIN_DESC1 _desc{};
+		_desc.BufferCount = pDesc->mImageCount;
+		_desc.Width = pDesc->mWidth;
+		_desc.Height = pDesc->mHeight;
+		_desc.Format = pDesc->mColorFormat;
+		_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		_desc.SampleDesc.Count = 1;
+		_desc.SampleDesc.Quality = 0;
+		_desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+		_desc.Scaling = DXGI_SCALING_STRETCH;
+
+		DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc{};
+		fsSwapChainDesc.Windowed = TRUE;
+
+		IDXGIFactory7* temp_factory = nullptr;
+#ifdef _DEBUG
+		CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&temp_factory));
+#else
+		CreateDXGIFactory2(0, IID_PPV_ARGS(&temp_factory));
+#endif
+		IDXGISwapChain1* temp_swapchain = nullptr;
+		temp_factory->CreateSwapChainForHwnd(pQueue->pDxQueue, (HWND)pDesc->mWindowHandle.window, &_desc, &fsSwapChainDesc, nullptr, &temp_swapchain);
+		temp_swapchain->QueryInterface(&pSwapChain->pDxSwapChain);
+		temp_factory->MakeWindowAssociation((HWND)pDesc->mWindowHandle.window, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
+		
+		temp_factory->Release();
+		temp_swapchain->Release();
+
+		pSwapChain->pDxSwapChain->QueryInterface(&pQueue->pSubmitSwapChain);
+		pSwapChain->pFenceValue = new uint64_t[pDesc->mImageCount]{};
+
+		*ppSwapChain = pSwapChain;
+	}
+
+	void RemoveSwapChain(SwapChain* pSwapChain) {
+		assert(pSwapChain);
+		pSwapChain->pDxSwapChain->Release();
+		delete[]pSwapChain->pFenceValue;
+		delete pSwapChain;
+	}
+
+	void QueuePresent(Queue* pQueue, SwapChain* pSwapChain) {
+		assert(pQueue->pSubmitSwapChain == pSwapChain->pDxSwapChain);
+
+		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+		pSwapChain->pFenceValue[frameIndex] = pQueue->mFenceValue++;
+
+		pSwapChain->pDxSwapChain->Present(1, 0);
+
+		const uint64_t currentFenceValue = pSwapChain->pFenceValue[frameIndex];
+		pQueue->pDxQueue->Signal(pQueue->pDxFence, currentFenceValue);
+
+		frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+
+		if (pQueue->pDxFence->GetCompletedValue() < pSwapChain->pFenceValue[frameIndex])
+		{
+			pQueue->pDxFence->SetEventOnCompletion(pSwapChain->pFenceValue[frameIndex], pQueue->pDxWaitIdleFenceEvent);
+			WaitForSingleObjectEx(pQueue->pDxWaitIdleFenceEvent, INFINITE, FALSE);
+		}
 	}
 }

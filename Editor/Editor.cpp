@@ -39,28 +39,33 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	wcex.hIconSm = LoadIconW(wcex.hInstance, L"IDI_ICON");
 	RegisterClassExW(&wcex);
 
+	RECT rc = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+	auto stype = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX;
+	AdjustWindowRect(&rc, stype, FALSE);
+	auto hwnd = CreateWindowExW(0, L"RainbowEditor", L"RainbowEditor", stype, 50, 50, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	Rainbow::Device* pDevice = nullptr;
 	Rainbow::CreateDevice(&pDevice);
 	Rainbow::Queue* pQueue = nullptr;
 	Rainbow::QueueDesc queueDesc = { Rainbow::QUEUE_TYPE_GRAPHICS };
 	Rainbow::CreateQueue(pDevice, &queueDesc, &pQueue);
+	Rainbow::SwapChain* pSwapChain = nullptr;
+	Rainbow::SwapChainDesc swapchainDesc{ hwnd, 3, width, height, DXGI_FORMAT_R8G8B8A8_UNORM };
+	Rainbow::CreateSwapChain(pQueue, &swapchainDesc, &pSwapChain);
 
-	RECT rc = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
-	auto stype = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX;
-	AdjustWindowRect(&rc, stype, FALSE);
-	auto hwnd = CreateWindowExW(0, L"RainbowEditor", L"RainbowEditor", stype, 50, 50, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
-
 	MSG msg{};
 	while (msg.message != WM_QUIT) {
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		//std::invoke(std::forward<Function>(f), std::forward<Args>(args)...);
+		else {
+			Rainbow::QueuePresent(pQueue, pSwapChain);
+		}
 	}
 
+	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveQueue(pQueue);
 	Rainbow::RemoveDevice(pDevice);
 
