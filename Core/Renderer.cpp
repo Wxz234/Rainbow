@@ -13,6 +13,7 @@
 #include <cassert>
 
 #pragma warning (disable: 6011)
+#pragma warning (disable: 4838)
 
 namespace Rainbow {
 	void CreateDevice(Device** ppDevice) {
@@ -57,11 +58,24 @@ namespace Rainbow {
 		assert(pDevice);
 		assert(pDesc);
 		assert(ppTexture);
+		D3D12_RESOURCE_DESC texDesc{ D3D12_RESOURCE_DIMENSION_TEXTURE2D, 0, pDesc->mWidth, pDesc->mHeight, pDesc->mArraySize, pDesc->mMipLevels, pDesc->mFormat, { 1, 0 }, D3D12_TEXTURE_LAYOUT_UNKNOWN, pDesc->mFlags };
 
+		D3D12MA::ALLOCATION_DESC allocDesc{};
+		allocDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+		Texture* pTexture = new Texture;
 
-	//	//pDevice->pDxDevice->CreateCommittedResource()
+		D3D12_CLEAR_VALUE* pOptimizedClearValue = nullptr;
+		if ((pDesc->mFlags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET) || (pDesc->mFlags & D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL))
+		{
+			pOptimizedClearValue = &pDesc->mClearValue;
+		}
+		pDevice->pResourceAllocator->CreateResource(&allocDesc, &texDesc, pDesc->mStartState, pOptimizedClearValue, &pTexture->pDxAllocation, IID_PPV_ARGS(&pTexture->pDxResource));
+
+		*ppTexture = pTexture;
 	}
 	void RemoveTexture(Texture* pTexture) {
 		assert(pTexture);
+		pTexture->pDxAllocation->Release();
+		pTexture->pDxResource->Release();
 	}
 }

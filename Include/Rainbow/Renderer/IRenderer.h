@@ -11,7 +11,6 @@
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include <string>
 #include <cstdint>
 
 namespace Rainbow {
@@ -37,9 +36,14 @@ namespace Rainbow {
 	};
 
 	struct TextureDesc {
-		DXGI_FORMAT Format;
-		uint64_t Width;
-		uint32_t Height;
+		D3D12_CLEAR_VALUE mClearValue;
+		DXGI_FORMAT mFormat;
+		uint32_t mWidth;
+		uint32_t mHeight;
+		uint32_t mArraySize;
+		uint32_t mMipLevels;
+		D3D12_RESOURCE_STATES mStartState;
+		D3D12_RESOURCE_FLAGS mFlags;
 	};
 
 	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture);
