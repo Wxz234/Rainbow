@@ -11,6 +11,17 @@ add_library(imgui STATIC
 	ThirdParty/imgui/backends/imgui_impl_win32.h
 	ThirdParty/imgui/backends/imgui_impl_dx12.cpp
 	ThirdParty/imgui/backends/imgui_impl_dx12.h
+	ThirdParty/imgui/imconfig.h
+	ThirdParty/imgui/imgui.cpp
+	ThirdParty/imgui/imgui.h
+	ThirdParty/imgui/imgui_demo.cpp
+	ThirdParty/imgui/imgui_draw.cpp
+	ThirdParty/imgui/imgui_internal.h
+	ThirdParty/imgui/imgui_tables.cpp
+	ThirdParty/imgui/imgui_widgets.cpp
+	ThirdParty/imgui/imstb_rectpack.h
+	ThirdParty/imgui/imstb_textedit.h
+	ThirdParty/imgui/imstb_truetype.h
 )
 target_include_directories(imgui PRIVATE "ThirdParty/imgui/")
 set_property(TARGET imgui PROPERTY FOLDER "ThirdParty")
@@ -27,5 +38,5 @@ target_compile_definitions(RainbowRuntime PRIVATE UNICODE _UNICODE)
 add_executable(RainbowEditor WIN32 Editor/Editor.cpp)
 target_include_directories(RainbowEditor PRIVATE "Include")
 target_compile_definitions(RainbowEditor PRIVATE UNICODE _UNICODE)
-target_link_libraries(RainbowEditor PRIVATE RainbowCore RainbowRuntime)
+target_link_libraries(RainbowEditor PRIVATE RainbowCore RainbowRuntime imgui)
 target_link_libraries(RainbowEditor PRIVATE d3d12 dxgi dxguid)
