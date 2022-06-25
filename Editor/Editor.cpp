@@ -55,7 +55,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::GUI* pGui = nullptr;
 	Rainbow::CreateGUI(pDevice, pSwapChain, &pGui);
 	
-
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
 	MSG msg{};
 	while (msg.message != WM_QUIT) {

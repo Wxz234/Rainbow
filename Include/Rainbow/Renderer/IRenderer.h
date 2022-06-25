@@ -50,6 +50,7 @@ namespace Rainbow {
 
 	struct SwapChain {
 		IDXGISwapChain4* pDxSwapChain;
+		ID3D12DescriptorHeap* pDxRTVHeap;
 		uint64_t* pFenceValue;
 	};
 
