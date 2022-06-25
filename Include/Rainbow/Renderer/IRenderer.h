@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../Window/Window.h"
-#include "../ThirdParty/D3D12MemoryAllocator/include/D3D12MemAlloc.h"
+#include "../../../ThirdParty/D3D12MemoryAllocator/include/D3D12MemAlloc.h"
 
 #include <d3d12.h>
 #include <dxgi1_6.h>

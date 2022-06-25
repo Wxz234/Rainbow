@@ -6,7 +6,7 @@
 //
 
 #include "Rainbow/Renderer/IRenderer.h"
-#include "Rainbow/Math/Math.h"
+#include "Rainbow/GUI/GUI.h"
 
 #include <Windows.h>
 #include <d3d12.h>
@@ -53,7 +53,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::SwapChain* pSwapChain = nullptr;
 	Rainbow::SwapChainDesc swapchainDesc{ hwnd, 3, width, height, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pQueue, &swapchainDesc, &pSwapChain);
-
+	Rainbow::GUI* pGui = nullptr;
+	Rainbow::CreateGUI(pDevice, pSwapChain, &pGui);
 	
 
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
@@ -70,6 +71,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 		}
 	}
 
+	Rainbow::RemoveGUI(pGui);
 	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveQueue(pQueue);
 	Rainbow::RemoveDevice(pDevice);
