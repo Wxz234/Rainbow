@@ -24,6 +24,10 @@ bool ImGui_ImplDX12_Init(
 );
 void ImGui_ImplDX12_Shutdown();
 void ImGui_ImplWin32_Shutdown();
+void ImGui_ImplDX12_NewFrame();
+void ImGui_ImplWin32_NewFrame();
+void ImGui_ImplDX12_RenderDrawData(ImDrawData* draw_data, ID3D12GraphicsCommandList* ctx);
+LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Rainbow {
 	void CreateGUI(Device* pDevice, SwapChain* pSwapChain, GUI** ppGui) {
@@ -67,5 +71,19 @@ namespace Rainbow {
 		ImGui::DestroyContext();
 		pGui->pSrvHeap->Release();
 		delete pGui;
+	}
+
+	void NewFrame(GUI* pGui) {
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+	}
+
+	void DrawGUI(ID3D12GraphicsCommandList* ctx) {
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), ctx);
+	}
+
+	LRESULT GUIWndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+		return ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam);
 	}
 }
