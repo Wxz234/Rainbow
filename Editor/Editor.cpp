@@ -5,11 +5,10 @@
 // https://github.com/Wxz234/Rainbow
 //
 
-#include "Rainbow/Renderer/IRenderer.h"
-#include "Rainbow/GUI/GUI.h"
+#include "../Include/Rainbow/Renderer/IRenderer.h"
+#include "../Include/Rainbow/GUI/GUI.h"
 
 #include <Windows.h>
-#include <d3d12.h>
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {

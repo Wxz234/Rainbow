@@ -5,7 +5,7 @@
 // https://github.com/Wxz234/Rainbow
 //
 
-#include "Rainbow/Renderer/IRenderer.h"
+#include "../Include/Rainbow/Renderer/IRenderer.h"
 
 #include <d3d12sdklayers.h>
 #include <winerror.h>

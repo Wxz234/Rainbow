@@ -5,7 +5,7 @@
 // https://github.com/Wxz234/Rainbow
 //
 
-#include "Rainbow/GUI/GUI.h"
+#include "../Include/Rainbow/GUI/GUI.h"
 
 #include "../ThirdParty/imgui/imgui.h"
 
