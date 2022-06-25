@@ -7,6 +7,9 @@
 
 #include "Rainbow/GUI/GUI.h"
 
+#include "../ThirdParty/imgui/imgui.h"
+#include "../ThirdParty/imgui/backends/imgui_impl_dx12.h"
+
 #include <cassert>
 
 namespace Rainbow {
@@ -15,6 +18,11 @@ namespace Rainbow {
 		assert(pSwapChain);
 		assert(ppGui);
 		GUI* pGui = new GUI;
+
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGui::StyleColorsDark();
 		*ppGui = pGui;
 	}
 	void RemoveGUI(GUI* pGui) {

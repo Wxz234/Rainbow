@@ -11,7 +11,7 @@
 
 namespace Rainbow {
 	struct GUI {
-
+		ID3D12DescriptorHeap* pSrvHeap;
 	};
 
 	void CreateGUI(Device* pDevice, SwapChain* pSwapChain, GUI** ppGui);
