@@ -7,6 +7,8 @@
 
 #include "../Include/Rainbow/Renderer/IRenderer.h"
 
+#include "../ThirdParty/D3D12MemoryAllocator/include/D3D12MemAlloc.h"
+
 #include <d3d12sdklayers.h>
 #include <winerror.h>
 #include <combaseapi.h>
