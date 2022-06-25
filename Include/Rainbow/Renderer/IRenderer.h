@@ -52,6 +52,7 @@ namespace Rainbow {
 		IDXGISwapChain4* pDxSwapChain;
 		ID3D12DescriptorHeap* pDxRTVHeap;
 		uint64_t* pFenceValue;
+		uint32_t mDescriptorSize;
 	};
 
 	struct SwapChainDesc {
@@ -63,7 +64,9 @@ namespace Rainbow {
 	};
 
 	void CreateSwapChain(Queue* pQueue, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
-	void RemoveSwapChain(SwapChain* ppSwapChain);
+	void RemoveSwapChain(SwapChain* pSwapChain);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain);
 
 	void QueuePresent(Queue* pQueue, SwapChain* pSwapChain);
 }

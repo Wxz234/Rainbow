@@ -130,7 +130,6 @@ namespace Rainbow {
 		temp_factory->Release();
 		temp_swapchain->Release();
 		// rtv
-
 		ID3D12Device* temp_device = nullptr;
 		pQueue->pDxQueue->GetDevice(IID_PPV_ARGS(&temp_device));
 		D3D12_DESCRIPTOR_HEAP_DESC heapdesc = {};
@@ -139,14 +138,14 @@ namespace Rainbow {
 		heapdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		temp_device->CreateDescriptorHeap(&heapdesc, IID_PPV_ARGS(&pSwapChain->pDxRTVHeap));
 
-		SIZE_T rtvDescriptorSize = temp_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		pSwapChain->mDescriptorSize = temp_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = pSwapChain->pDxRTVHeap->GetCPUDescriptorHandleForHeapStart();
 		for (uint32_t i = 0; i < pDesc->mImageCount; i++)
 		{
 			ID3D12Resource* pBackBuffer = nullptr;
 			pSwapChain->pDxSwapChain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
 			temp_device->CreateRenderTargetView(pBackBuffer, NULL, rtvHandle);
-			rtvHandle.ptr += rtvDescriptorSize;
+			rtvHandle.ptr += pSwapChain->mDescriptorSize;
 			pBackBuffer->Release();
 		}
 
@@ -163,6 +162,13 @@ namespace Rainbow {
 		pSwapChain->pDxRTVHeap->Release();
 		delete[]pSwapChain->pFenceValue;
 		delete pSwapChain;
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain) {
+		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+		auto rtvHandle = pSwapChain->pDxRTVHeap->GetCPUDescriptorHandleForHeapStart();
+		rtvHandle.ptr += (pSwapChain->mDescriptorSize * frameIndex);
+		return rtvHandle;
 	}
 
 	void QueuePresent(Queue* pQueue, SwapChain* pSwapChain) {
