@@ -9,6 +9,7 @@
 #include "Rainbow/Math/Math.h"
 
 #include <Windows.h>
+#include <d3d12.h>
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -53,6 +54,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::SwapChainDesc swapchainDesc{ hwnd, 3, width, height, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pQueue, &swapchainDesc, &pSwapChain);
 
+	
+
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
 	MSG msg{};
 	while (msg.message != WM_QUIT) {
@@ -61,6 +64,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 			DispatchMessage(&msg);
 		}
 		else {
+
+
 			Rainbow::QueuePresent(pQueue, pSwapChain);
 		}
 	}

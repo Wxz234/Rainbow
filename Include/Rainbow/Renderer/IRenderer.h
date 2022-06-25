@@ -26,7 +26,7 @@ namespace Rainbow {
 
 	struct Device {
 		IDXGIAdapter4* pDxActiveGPU;
-		ID3D12Device* pDxDevice;
+		ID3D12Device7* pDxDevice;
 		D3D12MA::Allocator* pResourceAllocator;
 	};
 

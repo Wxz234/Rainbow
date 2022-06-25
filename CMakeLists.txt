@@ -26,7 +26,7 @@ add_library(imgui STATIC
 target_include_directories(imgui PRIVATE "ThirdParty/imgui/")
 set_property(TARGET imgui PROPERTY FOLDER "ThirdParty")
 
-add_library(RainbowCore STATIC Core/Core.cpp Core/Renderer.cpp)
+add_library(RainbowCore STATIC Core/Core.cpp Core/Renderer.cpp Core/GUI.cpp)
 target_include_directories(RainbowCore PRIVATE "Include")
 target_compile_definitions(RainbowCore PRIVATE UNICODE _UNICODE)
 target_link_libraries(RainbowCore PRIVATE D3D12MemoryAllocator)
@@ -36,7 +36,7 @@ target_include_directories(RainbowRuntime PRIVATE "Include")
 target_compile_definitions(RainbowRuntime PRIVATE UNICODE _UNICODE)
 
 add_executable(RainbowEditor WIN32 Editor/Editor.cpp)
-target_include_directories(RainbowEditor PRIVATE "Include")
+target_include_directories(RainbowEditor PRIVATE "Include" "ThirdParty/imgui/" "ThirdParty/imgui/backends")
 target_compile_definitions(RainbowEditor PRIVATE UNICODE _UNICODE)
 target_link_libraries(RainbowEditor PRIVATE RainbowCore RainbowRuntime imgui)
 target_link_libraries(RainbowEditor PRIVATE d3d12 dxgi dxguid)
