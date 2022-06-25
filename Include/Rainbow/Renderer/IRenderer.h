@@ -16,12 +16,6 @@
 #include <handleapi.h>
 
 namespace Rainbow {
-	enum PipelineType
-	{
-		PIPELINE_TYPE_GRAPHICS = 0,
-		PIPELINE_TYPE_COMPUTE,
-		PIPELINE_TYPE_COUNT,
-	};
 
 	enum QueueType
 	{
@@ -38,25 +32,6 @@ namespace Rainbow {
 
 	void CreateDevice(Device** ppDevice);
 	void RemoveDevice(Device* pDevice);
-
-	struct Texture {
-		ID3D12Resource* pDxResource;
-		D3D12MA::Allocation* pDxAllocation;
-	};
-
-	struct TextureDesc {
-		D3D12_CLEAR_VALUE mClearValue;
-		DXGI_FORMAT mFormat;
-		uint32_t mWidth;
-		uint32_t mHeight;
-		uint32_t mArraySize;
-		uint32_t mMipLevels;
-		D3D12_RESOURCE_STATES mStartState;
-		D3D12_RESOURCE_FLAGS mFlags;
-	};
-
-	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture);
-	void RemoveTexture(Texture* pTexture);
 
 	struct Queue {
 		ID3D12CommandQueue* pDxQueue;
