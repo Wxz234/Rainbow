@@ -58,7 +58,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::CreateSwapChain(pQueue, &swapchainDesc, &pSwapChain);
 	Rainbow::GUI* pGui = nullptr;
 	Rainbow::CreateGUI(pDevice, pSwapChain, &pGui);
-
+	
 	Rainbow::CmdPool* pCmdPool[frameCount]{};
 	Rainbow::CmdPoolDesc poolDesc{ Rainbow::COMMAND_TYPE_GRAPHICS };
 	Rainbow::Cmd* pCmd[frameCount]{};
@@ -92,8 +92,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 			pCmd[frameIndex]->pDxCmdList->ResourceBarrier(1, &barrier);
 
 			auto rtv = Rainbow::GetSwapChainRTV(pSwapChain);
-			float color[4] = { 0, 1, 0, 1 };
 			pCmd[frameIndex]->pDxCmdList->OMSetRenderTargets(1, &rtv, false, nullptr);
+			float color[4] = { 0, 1, 0, 1 };
 			pCmd[frameIndex]->pDxCmdList->ClearRenderTargetView(rtv, color, 0, nullptr);
 
 			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -112,6 +112,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 		Rainbow::RemoveCmdPool(pCmdPool[i]);
 		Rainbow::RemoveCmd(pCmd[i]);
 	}
+
 	Rainbow::RemoveGUI(pGui);
 	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveQueue(pQueue);
