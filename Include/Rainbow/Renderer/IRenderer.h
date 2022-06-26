@@ -100,6 +100,7 @@ namespace Rainbow {
 
 	void CmdReset(Cmd* pCmd);
 	void CmdClose(Cmd* pCmd);
+	void CmdResourceBarrier(Cmd* pCmd, ID3D12Resource* pRes, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
 
 	void QueueExecute(Queue* pQueue, Cmd* pCmd);
 }

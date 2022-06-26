@@ -76,29 +76,27 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 			DispatchMessage(&msg);
 		}
 		else {
+
+			Rainbow::GUINewFrame(pGui);
+
+			ImGui::Begin("Hello, world!");
+			ImGui::End();
+
 			auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
 			Rainbow::CmdReset(pCmd[frameIndex]);
 
 			ID3D12Resource* res = nullptr;
 			Rainbow::GetSwapChainBuffer(pSwapChain, frameIndex, &res);
-
-			D3D12_RESOURCE_BARRIER barrier = {};
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			barrier.Transition.pResource = res;
-			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			pCmd[frameIndex]->pDxCmdList->ResourceBarrier(1, &barrier);
+			Rainbow::CmdResourceBarrier(pCmd[frameIndex], res, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 			auto rtv = Rainbow::GetSwapChainRTV(pSwapChain);
 			pCmd[frameIndex]->pDxCmdList->OMSetRenderTargets(1, &rtv, false, nullptr);
 			float color[4] = { 0, 1, 0, 1 };
 			pCmd[frameIndex]->pDxCmdList->ClearRenderTargetView(rtv, color, 0, nullptr);
 
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-			pCmd[frameIndex]->pDxCmdList->ResourceBarrier(1, &barrier);
+			Rainbow::GUIDraw(pGui, pCmd[frameIndex]->pDxCmdList);
+
+			Rainbow::CmdResourceBarrier(pCmd[frameIndex], res, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 			Rainbow::CmdClose(pCmd[frameIndex]);
 			Rainbow::QueueExecute(pQueue, pCmd[frameIndex]);

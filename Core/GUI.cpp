@@ -79,7 +79,9 @@ namespace Rainbow {
 		ImGui::NewFrame();
 	}
 
-	void GUIDraw(ID3D12GraphicsCommandList* ctx) {
+	void GUIDraw(GUI* pGui,ID3D12GraphicsCommandList* ctx) {
+		ImGui::Render();
+		ctx->SetDescriptorHeaps(1, (ID3D12DescriptorHeap* const*)&pGui->pSrvHeap);
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), ctx);
 	}
 
