@@ -62,13 +62,13 @@ namespace Rainbow {
 		assert(ppQueue);
 		Queue* pQueue = new Queue;
 		D3D12_COMMAND_QUEUE_DESC queueDesc{};
-		if (pDesc->mType == QUEUE_TYPE_GRAPHICS) {
+		if (pDesc->mType == COMMAND_TYPE_GRAPHICS) {
 			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 		}
-		else if (pDesc->mType == QUEUE_TYPE_COMPUTE) {
+		else if (pDesc->mType == COMMAND_TYPE_GRAPHICS) {
 			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
 		}
-		else if (pDesc->mType == QUEUE_TYPE_COPY) {
+		else if (pDesc->mType == COMMAND_TYPE_GRAPHICS) {
 			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COPY;
 		}
 		pDevice->pDxDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&pQueue->pDxQueue));
@@ -191,5 +191,32 @@ namespace Rainbow {
 			pQueue->pDxFence->SetEventOnCompletion(pSwapChain->pFenceValue[frameIndex], pQueue->pDxWaitIdleFenceEvent);
 			WaitForSingleObjectEx(pQueue->pDxWaitIdleFenceEvent, INFINITE, FALSE);
 		}
+	}
+
+	void CreateCmdPool(Device* pDevice, CmdPoolDesc* pDesc, CmdPool** ppCmdPool) {
+		assert(pDevice);
+		assert(pDesc);
+		assert(ppCmdPool);
+
+		CmdPool* pCmdPool = new CmdPool;
+
+		D3D12_COMMAND_LIST_TYPE listDesc{};
+		if (pDesc->mType == COMMAND_TYPE_GRAPHICS) {
+			listDesc = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		}
+		else if (pDesc->mType == COMMAND_TYPE_GRAPHICS) {
+			listDesc = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+		}
+		else if (pDesc->mType == COMMAND_TYPE_GRAPHICS) {
+			listDesc = D3D12_COMMAND_LIST_TYPE_COPY;
+		}
+		pDevice->pDxDevice->CreateCommandAllocator(listDesc, IID_PPV_ARGS(&pCmdPool->pDxCmdAlloc));
+
+		*ppCmdPool = pCmdPool;
+	}
+	void RemoveCmdPool(CmdPool* pCmdPool) {
+		assert(pCmdPool);
+		pCmdPool->pDxCmdAlloc->Release();
+		delete pCmdPool;
 	}
 }

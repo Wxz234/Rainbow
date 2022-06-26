@@ -20,11 +20,11 @@ namespace D3D12MA {
 
 namespace Rainbow {
 
-	enum QueueType
+	enum CommandType
 	{
-		QUEUE_TYPE_GRAPHICS = 0,
-		QUEUE_TYPE_COPY,
-		QUEUE_TYPE_COMPUTE,
+		COMMAND_TYPE_GRAPHICS = 0,
+		COMMAND_TYPE_COPY,
+		COMMAND_TYPE_COMPUTE,
 	};
 
 	struct Device {
@@ -45,7 +45,7 @@ namespace Rainbow {
 	};
 
 	struct QueueDesc {
-		QueueType mType;
+		CommandType mType;
 	};
 
 	void CreateQueue(Device* pDevice, QueueDesc* pDesc, Queue** ppQueue);
@@ -70,6 +70,29 @@ namespace Rainbow {
 	void RemoveSwapChain(SwapChain* pSwapChain);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain);
-
 	void QueuePresent(Queue* pQueue, SwapChain* pSwapChain);
+
+	struct CmdPool {
+		ID3D12CommandAllocator* pDxCmdAlloc;
+	};
+
+	struct CmdPoolDesc {
+		CommandType mType;
+	};
+
+	void CreateCmdPool(Device* pDevice, CmdPoolDesc* pDesc, CmdPool** ppCmdPool);
+	void RemoveCmdPool(CmdPool* pCmdPool);
+
+	struct Cmd {
+		ID3D12GraphicsCommandList* pDxCmdList;
+		ID3D12CommandAllocator* pDxCmdAlloc;
+	};
+
+	struct CmdDesc {
+		CommandType mType;
+		CmdPool* pPool;
+	};
+
+	void CreateCmd(Device* pDevice, CmdDesc* pDesc, Cmd** ppCmd);
+	void RemoveCmd(CmdPool* pCmd);
 }
