@@ -19,7 +19,7 @@ namespace Rainbow {
 	void CreateGUI(Device* pDevice, SwapChain* pSwapChain, GUI** ppGui);
 	void RemoveGUI(GUI* pGui);
 
-	void NewFrame(GUI* pGui);
-	void DrawGUI(ID3D12GraphicsCommandList* ctx);
+	void GUINewFrame(GUI* pGui);
+	void GUIDraw(ID3D12GraphicsCommandList* ctx);
 	LRESULT GUIWndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 }

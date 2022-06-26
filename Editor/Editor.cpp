@@ -29,8 +29,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
-	uint32_t width = 800, height = 600;
-
+	constexpr uint32_t width = 800, height = 600, frameCount = 3;
+	
 	WNDCLASSEXW wcex = {};
 	wcex.cbSize = sizeof(WNDCLASSEXW);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -51,20 +51,23 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::Device* pDevice = nullptr;
 	Rainbow::CreateDevice(&pDevice);
 	Rainbow::Queue* pQueue = nullptr;
-	Rainbow::QueueDesc queueDesc = { Rainbow::QUEUE_TYPE_GRAPHICS };
+	Rainbow::QueueDesc queueDesc = { Rainbow::COMMAND_TYPE_GRAPHICS };
 	Rainbow::CreateQueue(pDevice, &queueDesc, &pQueue);
 	Rainbow::SwapChain* pSwapChain = nullptr;
-	Rainbow::SwapChainDesc swapchainDesc{ hwnd, 3, width, height, DXGI_FORMAT_R8G8B8A8_UNORM };
+	Rainbow::SwapChainDesc swapchainDesc{ hwnd, frameCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pQueue, &swapchainDesc, &pSwapChain);
 	Rainbow::GUI* pGui = nullptr;
 	Rainbow::CreateGUI(pDevice, pSwapChain, &pGui);
 
-	ID3D12CommandAllocator* mainAllocator[3]{};
-	pDevice->pDxDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mainAllocator[0]));
-	pDevice->pDxDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mainAllocator[1]));
-	pDevice->pDxDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mainAllocator[2]));
-	ID3D12GraphicsCommandList* mainList = nullptr;
-	pDevice->pDxDevice->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&mainList));
+	Rainbow::CmdPool* pCmdPool[frameCount]{};
+	Rainbow::CmdPoolDesc poolDesc{ Rainbow::COMMAND_TYPE_GRAPHICS };
+	Rainbow::Cmd* pCmd[frameCount]{};
+	for (uint32_t i = 0;i < frameCount; ++ i) {
+		Rainbow::CreateCmdPool(pDevice, &poolDesc, &pCmdPool[i]);
+		Rainbow::CmdDesc cmdDesc{ Rainbow::COMMAND_TYPE_GRAPHICS, pCmdPool[i] };
+		Rainbow::CreateCmd(pDevice, &cmdDesc, &pCmd[i]);
+	}
+
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
 	MSG msg{};
 	while (msg.message != WM_QUIT) {
@@ -73,60 +76,46 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 			DispatchMessage(&msg);
 		}
 		else {
-			Rainbow::NewFrame(pGui);
-
-			bool is_open = true;
-			ImGui::Begin("Another Window", &is_open);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-			ImGui::Text("Hello from another window!");
-			ImGui::End();
-		
-			ImGui::Render();
-
 			auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
-			ID3D12Resource* rtResource = nullptr;
-			pSwapChain->pDxSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&rtResource));
+			Rainbow::CmdReset(pCmd[frameIndex]);
+
+			ID3D12Resource* res = nullptr;
+			Rainbow::GetSwapChainBuffer(pSwapChain, frameIndex, &res);
 
 			D3D12_RESOURCE_BARRIER barrier = {};
 			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			barrier.Transition.pResource = rtResource;
+			barrier.Transition.pResource = res;
 			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			mainAllocator[frameIndex]->Reset();
-			mainList->Reset(mainAllocator[frameIndex], nullptr);
-			mainList->ResourceBarrier(1, &barrier);
+			pCmd[frameIndex]->pDxCmdList->ResourceBarrier(1, &barrier);
 
-			const float clear_color_with_alpha[4] = { 0, 0, 0, 1 };
 			auto rtv = Rainbow::GetSwapChainRTV(pSwapChain);
-			mainList->ClearRenderTargetView(rtv, clear_color_with_alpha, 0, nullptr);
-			mainList->OMSetRenderTargets(1, &rtv, FALSE, nullptr);
-			mainList->SetDescriptorHeaps(1, &pGui->pSrvHeap);
-
-			Rainbow::DrawGUI(mainList);
+			float color[4] = { 0, 1, 0, 1 };
+			pCmd[frameIndex]->pDxCmdList->OMSetRenderTargets(1, &rtv, false, nullptr);
+			pCmd[frameIndex]->pDxCmdList->ClearRenderTargetView(rtv, color, 0, nullptr);
 
 			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-			mainList->ResourceBarrier(1, &barrier);
-			mainList->Close();
+			pCmd[frameIndex]->pDxCmdList->ResourceBarrier(1, &barrier);
 
-			pQueue->pDxQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&mainList);
-
+			Rainbow::CmdClose(pCmd[frameIndex]);
+			Rainbow::QueueExecute(pQueue, pCmd[frameIndex]);
 			Rainbow::QueuePresent(pQueue, pSwapChain);
-			rtResource->Release();
 
+			res->Release();
 		}
 	}
 
+	for (uint32_t i = 0; i < frameCount; ++i) {
+		Rainbow::RemoveCmdPool(pCmdPool[i]);
+		Rainbow::RemoveCmd(pCmd[i]);
+	}
 	Rainbow::RemoveGUI(pGui);
 	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveQueue(pQueue);
 	Rainbow::RemoveDevice(pDevice);
-
-	mainAllocator[0]->Release();
-	mainAllocator[1]->Release();
-	mainAllocator[2]->Release();
-	mainList->Release();
 
 	return 0;
 }

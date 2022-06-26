@@ -73,13 +73,13 @@ namespace Rainbow {
 		delete pGui;
 	}
 
-	void NewFrame(GUI* pGui) {
+	void GUINewFrame(GUI* pGui) {
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 	}
 
-	void DrawGUI(ID3D12GraphicsCommandList* ctx) {
+	void GUIDraw(ID3D12GraphicsCommandList* ctx) {
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), ctx);
 	}
 

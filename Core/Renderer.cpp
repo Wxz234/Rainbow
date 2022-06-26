@@ -219,4 +219,55 @@ namespace Rainbow {
 		pCmdPool->pDxCmdAlloc->Release();
 		delete pCmdPool;
 	}
+
+	void CreateCmd(Device* pDevice, CmdDesc* pDesc, Cmd** ppCmd) {
+		assert(pDevice);
+		assert(pDesc);
+		assert(ppCmd);
+		Cmd* pCmd = new Cmd;
+		D3D12_COMMAND_LIST_TYPE listDesc{};
+		if (pDesc->mType == COMMAND_TYPE_GRAPHICS) {
+			listDesc = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		}
+		else if (pDesc->mType == COMMAND_TYPE_GRAPHICS) {
+			listDesc = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+		}
+		else if (pDesc->mType == COMMAND_TYPE_GRAPHICS) {
+			listDesc = D3D12_COMMAND_LIST_TYPE_COPY;
+		}
+		pDevice->pDxDevice->CreateCommandList1(0, listDesc, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&pCmd->pDxCmdList));
+		pDesc->pPool->pDxCmdAlloc->QueryInterface(&pCmd->pDxCmdAlloc);
+		*ppCmd = pCmd;
+	}
+	void RemoveCmd(Cmd* pCmd) {
+		assert(pCmd);
+		pCmd->pDxCmdAlloc->Release();
+		pCmd->pDxCmdList->Release();
+		delete pCmd;
+	}
+
+	void CmdReset(Cmd* pCmd) {
+		assert(pCmd);
+		pCmd->pDxCmdAlloc->Reset();
+		pCmd->pDxCmdList->Reset(pCmd->pDxCmdAlloc, nullptr);
+	}
+
+	void CmdClose(Cmd* pCmd) {
+		assert(pCmd);
+		pCmd->pDxCmdList->Close();
+	}
+
+	void QueueExecute(Queue* pQueue, Cmd* pCmd) {
+		assert(pQueue);
+		assert(pCmd);
+		pQueue->pDxQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&pCmd->pDxCmdList);
+	}
+
+
+	void GetSwapChainBuffer(SwapChain* pSwapChain, uint32_t index, ID3D12Resource** ppRes) {
+		assert(pSwapChain);
+		assert(ppRes);
+
+		pSwapChain->pDxSwapChain->GetBuffer(index, IID_PPV_ARGS(ppRes));
+	}
 }

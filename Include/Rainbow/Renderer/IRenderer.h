@@ -69,6 +69,8 @@ namespace Rainbow {
 	void CreateSwapChain(Queue* pQueue, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
 	void RemoveSwapChain(SwapChain* pSwapChain);
 
+	void GetSwapChainBuffer(SwapChain* pSwapChain, uint32_t index,ID3D12Resource **ppRes);
+
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain);
 	void QueuePresent(Queue* pQueue, SwapChain* pSwapChain);
 
@@ -94,5 +96,10 @@ namespace Rainbow {
 	};
 
 	void CreateCmd(Device* pDevice, CmdDesc* pDesc, Cmd** ppCmd);
-	void RemoveCmd(CmdPool* pCmd);
+	void RemoveCmd(Cmd* pCmd);
+
+	void CmdReset(Cmd* pCmd);
+	void CmdClose(Cmd* pCmd);
+
+	void QueueExecute(Queue* pQueue, Cmd* pCmd);
 }
