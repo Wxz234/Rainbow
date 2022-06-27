@@ -12,12 +12,26 @@
 
 #include <Windows.h>
 
+uint32_t width = 1024, height = 768;
+constexpr uint32_t frameCount = 3;
+Rainbow::SwapChain* pSwapChain = nullptr;
+Rainbow::Queue* pQueue = nullptr;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (Rainbow::GUIWndProcHandler(hWnd, message, wParam, lParam))
 		return true;
 	switch (message)
 	{
+	case WM_SIZE:
+
+		width = LOWORD(lParam);
+		height = HIWORD(lParam);
+
+		QueueWait(pQueue);
+		Rainbow::SwapChainResize(pSwapChain, width, height, DXGI_FORMAT_UNKNOWN);
+
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -28,9 +42,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
-{
-	constexpr uint32_t width = 800, height = 600, frameCount = 3;
-	
+{	
 	WNDCLASSEXW wcex = {};
 	wcex.cbSize = sizeof(WNDCLASSEXW);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -44,16 +56,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	RegisterClassExW(&wcex);
 
 	RECT rc = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
-	auto stype = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX;
+	auto stype = WS_OVERLAPPEDWINDOW ;
 	AdjustWindowRect(&rc, stype, FALSE);
-	auto hwnd = CreateWindowExW(0, L"RainbowEditor", L"RainbowEditor", stype, 50, 50, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
+	auto hwnd = CreateWindowExW(0, L"RainbowEditor", L"RainbowEditor", stype, 10, 10, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	Rainbow::Device* pDevice = nullptr;
 	Rainbow::CreateDevice(&pDevice);
-	Rainbow::Queue* pQueue = nullptr;
+
 	Rainbow::QueueDesc queueDesc = { Rainbow::COMMAND_TYPE_GRAPHICS };
 	Rainbow::CreateQueue(pDevice, &queueDesc, &pQueue);
-	Rainbow::SwapChain* pSwapChain = nullptr;
 	Rainbow::SwapChainDesc swapchainDesc{ hwnd, frameCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pQueue, &swapchainDesc, &pSwapChain);
 	Rainbow::GUI* pGui = nullptr;
@@ -76,12 +87,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 			DispatchMessage(&msg);
 		}
 		else {
-
 			Rainbow::GUINewFrame(pGui);
-
-			ImGui::Begin("Hello, world!");
-			ImGui::End();
-
+			//MenuBar
+			ImGui::BeginMainMenuBar();
+			ImGui::EndMainMenuBar();
+			
 			auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
 			Rainbow::CmdReset(pCmd[frameIndex]);
 

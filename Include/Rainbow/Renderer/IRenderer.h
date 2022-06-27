@@ -50,6 +50,7 @@ namespace Rainbow {
 
 	void CreateQueue(Device* pDevice, QueueDesc* pDesc, Queue** ppQueue);
 	void RemoveQueue(Queue* pQueue);
+	void QueueWait(Queue* pQueue);
 
 	struct SwapChain {
 		IDXGISwapChain4* pDxSwapChain;
@@ -68,7 +69,7 @@ namespace Rainbow {
 
 	void CreateSwapChain(Queue* pQueue, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
 	void RemoveSwapChain(SwapChain* pSwapChain);
-
+	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
 	void GetSwapChainBuffer(SwapChain* pSwapChain, uint32_t index,ID3D12Resource **ppRes);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain);

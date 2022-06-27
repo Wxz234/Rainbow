@@ -97,6 +97,17 @@ namespace Rainbow {
 		delete pQueue;
 	}
 
+	void QueueWait(Queue* pQueue) {
+		assert(pQueue);
+		const uint64_t fence = pQueue->mFenceValue++;
+		pQueue->pDxQueue->Signal(pQueue->pDxFence, fence);
+		if (pQueue->pDxFence->GetCompletedValue() < fence)
+		{
+			pQueue->pDxFence->SetEventOnCompletion(fence, pQueue->pDxWaitIdleFenceEvent);
+			WaitForSingleObject(pQueue->pDxWaitIdleFenceEvent, INFINITE);
+		}
+	}
+
 	void CreateSwapChain(Queue* pQueue, SwapChainDesc* pDesc, SwapChain** ppSwapChain) {
 		assert(pQueue);
 		assert(pDesc);
@@ -164,6 +175,39 @@ namespace Rainbow {
 		pSwapChain->pDxRTVHeap->Release();
 		delete[]pSwapChain->pFenceValue;
 		delete pSwapChain;
+	}
+
+	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format) {
+		assert(pSwapChain);
+
+		DXGI_SWAP_CHAIN_DESC scDesc{};
+		pSwapChain->pDxSwapChain->GetDesc(&scDesc);
+
+		pSwapChain->pDxSwapChain->ResizeBuffers(scDesc.BufferCount, width, height, format, 0);
+		// rtv
+
+		ID3D12Device* temp_device = nullptr;
+		pSwapChain->pDxRTVHeap->GetDevice(IID_PPV_ARGS(&temp_device));
+		D3D12_DESCRIPTOR_HEAP_DESC heapdesc = {};
+		heapdesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+		heapdesc.NumDescriptors = scDesc.BufferCount;
+		heapdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+
+		pSwapChain->pDxRTVHeap->Release();
+
+		temp_device->CreateDescriptorHeap(&heapdesc, IID_PPV_ARGS(&pSwapChain->pDxRTVHeap));
+
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = pSwapChain->pDxRTVHeap->GetCPUDescriptorHandleForHeapStart();
+		for (uint32_t i = 0; i < scDesc.BufferCount; i++)
+		{
+			ID3D12Resource* pBackBuffer = nullptr;
+			pSwapChain->pDxSwapChain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
+			temp_device->CreateRenderTargetView(pBackBuffer, NULL, rtvHandle);
+			rtvHandle.ptr += pSwapChain->mDescriptorSize;
+			pBackBuffer->Release();
+		}
+
+		temp_device->Release();
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain) {
