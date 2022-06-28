@@ -116,7 +116,9 @@ void GuiDockSpace() {
 	ImGui::End();
 }
 
+void test() {
 
+}
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {	
@@ -152,7 +154,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 		Rainbow::CmdDesc cmdDesc{ Rainbow::COMMAND_TYPE_GRAPHICS, pCmdPool[i] };
 		Rainbow::CreateCmd(pDevice, &cmdDesc, &pCmd[i]);
 	}
-	bool my_tool_activexx = true;
+
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
 	MSG msg{};
 	while (msg.message != WM_QUIT) {

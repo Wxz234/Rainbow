@@ -10,7 +10,7 @@
 #include "GameObject.h"
 
 namespace Rainbow {
-	struct Light {
+	struct Light : public GameObject {
 
 	};
 }
