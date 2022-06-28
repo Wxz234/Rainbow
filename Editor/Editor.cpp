@@ -116,7 +116,9 @@ void GuiDockSpace() {
 	ImGui::End();
 }
 
-void test() {
+
+
+void gameWindow() {
 
 }
 
@@ -145,7 +147,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::SwapChainDesc swapchainDesc{ hwnd, frameCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pQueue, &swapchainDesc, &pSwapChain);
 	Rainbow::CreateGUI(pDevice, pSwapChain, &pGui);
-	//ImGui::LoadIniSettingsFromDisk(const char* ini_filename);
+
 	auto path = RAINBOW_PATH + std::string("Config/editor_imgui.ini");
 	ImGui::LoadIniSettingsFromDisk(path.c_str());
 	Rainbow::CmdPoolDesc poolDesc{ Rainbow::COMMAND_TYPE_GRAPHICS };
@@ -200,14 +202,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 		}
 	}
 
+	// must release queue firstly.
+	Rainbow::RemoveQueue(pQueue);
+	Rainbow::RemoveSwapChain(pSwapChain);
+
 	for (uint32_t i = 0; i < frameCount; ++i) {
 		Rainbow::RemoveCmdPool(pCmdPool[i]);
 		Rainbow::RemoveCmd(pCmd[i]);
 	}
 
 	Rainbow::RemoveGUI(pGui);
-	Rainbow::RemoveSwapChain(pSwapChain);
-	Rainbow::RemoveQueue(pQueue);
 	Rainbow::RemoveDevice(pDevice);
 
 	return 0;
