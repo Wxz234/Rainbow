@@ -16,6 +16,7 @@
 
 namespace D3D12MA {
 	class Allocator;
+	class Allocation;
 }
 
 namespace Rainbow {
