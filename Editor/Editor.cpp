@@ -201,8 +201,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 			Rainbow::CmdClose(pCmd[frameIndex]);
 			Rainbow::QueueExecute(pQueue, pCmd[frameIndex]);
 
-			//ImGui::UpdatePlatformWindows();
-			//ImGui::RenderPlatformWindowsDefault();
 			Rainbow::QueuePresent(pQueue, pSwapChain);
 
 			res->Release();
