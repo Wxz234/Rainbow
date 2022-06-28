@@ -5,5 +5,12 @@
 // https://github.com/Wxz234/Rainbow
 //
 
-#include "../Include/Rainbow/Runtime/GameObject.h"
-#include "../Include/Rainbow/Runtime/Light.h"
+#pragma once
+
+#include "GameObject.h"
+
+namespace Rainbow {
+	struct Light {
+
+	};
+}
