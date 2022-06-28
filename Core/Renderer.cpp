@@ -334,4 +334,30 @@ namespace Rainbow {
 
 		pSwapChain->pDxSwapChain->GetBuffer(index, IID_PPV_ARGS(ppRes));
 	}
+
+	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture) {
+		assert(pDevice);
+		assert(pDesc);
+		assert(ppTexture);
+		Texture* pTexture = new Texture;
+
+		D3D12_RESOURCE_DESC resourceDesc{ D3D12_RESOURCE_DIMENSION_TEXTURE2D, 0, pDesc->mWidth, pDesc->mHeight, 1, pDesc->mMipLevels, pDesc->mFormat,{ 1, 0 }, D3D12_TEXTURE_LAYOUT_UNKNOWN, pDesc->mFlags };
+
+		D3D12MA::ALLOCATION_DESC allocDesc = {};
+		allocDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+
+		ID3D12Resource* resource;
+		D3D12MA::Allocation* allocation;
+		HRESULT hr = pDevice->pResourceAllocator->CreateResource(
+			&allocDesc, &resourceDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST, NULL,
+			&allocation, IID_PPV_ARGS(&resource));
+
+		*ppTexture = pTexture;
+	}
+	void RemoveTexture(Texture* pTexture) {
+		assert(pTexture);
+		pTexture->pAllocation->Release();
+		delete pTexture;
+	}
 }

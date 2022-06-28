@@ -7,6 +7,7 @@
 
 #include "../Include/Rainbow/Renderer/IRenderer.h"
 #include "../Include/Rainbow/GUI/GUI.h"
+#include "../Include/Rainbow/Runtime/Scene.h"
 
 #include "../ThirdParty/imgui/imgui.h"
 
@@ -156,6 +157,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 		Rainbow::CmdDesc cmdDesc{ Rainbow::COMMAND_TYPE_GRAPHICS, pCmdPool[i] };
 		Rainbow::CreateCmd(pDevice, &cmdDesc, &pCmd[i]);
 	}
+
 
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
 	MSG msg{};

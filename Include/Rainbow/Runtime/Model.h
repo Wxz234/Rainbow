@@ -11,17 +11,10 @@
 
 #include "GameObject.h"
 
-#include <vector>
-
 namespace Rainbow {
-	struct Scene {
+	struct Model : public GameObject {
 
-		void Draw() {}
-
-		std::vector<GameObject*> gameobject;
-		Device* pDevice;
 	};
 
-	void CreateScene(Device* pDevice, Scene** ppScene);
-	void RemoveScene(Scene* pScene);
+	void CreateGLTF(Device* pDevice, const char* file, Model** ppModel);
 }

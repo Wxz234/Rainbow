@@ -104,4 +104,19 @@ namespace Rainbow {
 	void CmdResourceBarrier(Cmd* pCmd, ID3D12Resource* pRes, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
 
 	void QueueExecute(Queue* pQueue, Cmd* pCmd);
+
+	struct Texture {
+		D3D12MA::Allocation* pAllocation;
+	};
+
+	struct TextureDesc {
+		uint32_t mWidth;
+		uint32_t mHeight;
+		uint16_t mMipLevels;
+		DXGI_FORMAT mFormat;
+		D3D12_RESOURCE_FLAGS mFlags;
+	};
+
+	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture);
+	void RemoveTexture(Texture* pTexture);
 }
