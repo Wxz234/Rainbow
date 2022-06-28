@@ -8,6 +8,7 @@
 #include "../Include/Rainbow/GUI/GUI.h"
 
 #include "../ThirdParty/imgui/imgui.h"
+#include "../ThirdParty/imgui/imgui_internal.h"
 
 #include <cassert>
 #include <combaseapi.h>
@@ -45,8 +46,9 @@ namespace Rainbow {
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 		ImGui::StyleColorsDark();
-
 		HWND hwnd;
 		pSwapChain->pDxSwapChain->GetHwnd(&hwnd);
 
