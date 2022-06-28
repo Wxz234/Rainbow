@@ -11,6 +11,7 @@
 #include "../ThirdParty/imgui/imgui.h"
 
 #include <Windows.h>
+#include <string>
 
 uint32_t width = 1024, height = 768;
 constexpr uint32_t frameCount = 3;
@@ -97,23 +98,14 @@ void GuiDockSpace() {
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("Options"))
+		if (ImGui::BeginMenu("File"))
 		{
 			// Disabling fullscreen would allow the window to be moved to the front of other windows,
 			// which we can't undo at the moment without finer window depth/z control.
-			ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen);
-			ImGui::MenuItem("Padding", NULL, &opt_padding);
+			bool opt_fullscreen = false;
+			ImGui::MenuItem("Test", NULL, &opt_fullscreen);
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Flag: NoSplit", "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoSplit; }
-			if (ImGui::MenuItem("Flag: NoResize", "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoResize; }
-			if (ImGui::MenuItem("Flag: NoDockingInCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingInCentralNode) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode; }
-			if (ImGui::MenuItem("Flag: AutoHideTabBar", "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
-			if (ImGui::MenuItem("Flag: PassthruCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen)) { dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; }
-			ImGui::Separator();
-
-			if (ImGui::MenuItem("Close", NULL, false, p_open != NULL))
-				*p_open = false;
 			ImGui::EndMenu();
 		}
 
@@ -123,6 +115,7 @@ void GuiDockSpace() {
 
 	ImGui::End();
 }
+
 
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
@@ -150,8 +143,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::SwapChainDesc swapchainDesc{ hwnd, frameCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pQueue, &swapchainDesc, &pSwapChain);
 	Rainbow::CreateGUI(pDevice, pSwapChain, &pGui);
-	//LoadIniSettingsFromDisk(const char* ini_filename);
-	
+	//ImGui::LoadIniSettingsFromDisk(const char* ini_filename);
+	auto path = RAINBOW_PATH + std::string("Config/editor_imgui.ini");
+	ImGui::LoadIniSettingsFromDisk(path.c_str());
 	Rainbow::CmdPoolDesc poolDesc{ Rainbow::COMMAND_TYPE_GRAPHICS };
 	for (uint32_t i = 0;i < frameCount; ++ i) {
 		Rainbow::CreateCmdPool(pDevice, &poolDesc, &pCmdPool[i]);
@@ -168,19 +162,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 		}
 		else {
 			Rainbow::GUINewFrame(pGui);
-			//MenuBar
-
-			//ImGui::BeginMainMenuBar();
-			//auto menuBarSize = ImGui::GetWindowSize();
-			//ImGui::EndMainMenuBar();
 
 			GuiDockSpace();
-			ImGui::Begin("1");
+			ImGui::Begin("Scene");
 			ImGui::End();
-			ImGui::Begin("12");
+			ImGui::Begin("Game");
 			ImGui::End();
-			//ImGui::DockSpace(my_id, ImVec2(0.0f, 0.0f), 0);
-			//ImGui::DockSpace(ImGui::GetID("1"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_AutoHideTabBar);
+			ImGui::Begin("Content Browser");
+			ImGui::End();
+			ImGui::Begin("Details");
+			ImGui::End();
 			
 			auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
 			Rainbow::CmdReset(pCmd[frameIndex]);
