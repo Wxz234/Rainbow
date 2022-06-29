@@ -29,6 +29,24 @@ namespace Rainbow {
 		COMMAND_TYPE_COMPUTE,
 	};
 
+	struct CmdPool {
+		ID3D12CommandAllocator* pDxCmdAlloc;
+	};
+
+	struct CmdPoolDesc {
+		CommandType mType;
+	};
+
+	struct Cmd {
+		ID3D12GraphicsCommandList* pDxCmdList;
+		ID3D12CommandAllocator* pDxCmdAlloc;
+	};
+
+	struct CmdDesc {
+		CommandType mType;
+		CmdPool* pPool;
+	};
+
 	struct Queue {
 		ID3D12CommandQueue* pDxQueue;
 		ID3D12Fence* pDxFence;
@@ -40,9 +58,12 @@ namespace Rainbow {
 	struct Device {
 		IDXGIAdapter4* pDxActiveGPU;
 		ID3D12Device7* pDxDevice;
+
 		D3D12MA::Allocator* pResourceAllocator;
 
 		Queue* pQueue;
+		CmdPool* pPool;
+		Cmd* pCmd;
 	};
 
 	void CreateDevice(Device** ppDevice);
@@ -56,26 +77,8 @@ namespace Rainbow {
 	void RemoveQueue(Queue* pQueue);
 	void QueueWait(Queue* pQueue);
 
-	struct CmdPool {
-		ID3D12CommandAllocator* pDxCmdAlloc;
-	};
-
-	struct CmdPoolDesc {
-		CommandType mType;
-	};
-
 	void CreateCmdPool(Device* pDevice, CmdPoolDesc* pDesc, CmdPool** ppCmdPool);
 	void RemoveCmdPool(CmdPool* pCmdPool);
-
-	struct Cmd {
-		ID3D12GraphicsCommandList* pDxCmdList;
-		ID3D12CommandAllocator* pDxCmdAlloc;
-	};
-
-	struct CmdDesc {
-		CommandType mType;
-		CmdPool* pPool;
-	};
 
 	void CreateCmd(Device* pDevice, CmdDesc* pDesc, Cmd** ppCmd);
 	void RemoveCmd(Cmd* pCmd);
@@ -117,7 +120,6 @@ namespace Rainbow {
 
 	struct Texture {
 		D3D12MA::Allocation* pAllocation;
-		ID3D12DescriptorHeap* pDxSrv;
 	};
 
 	struct TextureDesc {

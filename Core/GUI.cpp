@@ -64,6 +64,7 @@ namespace Rainbow {
 			pGui->pSrvHeap->GetCPUDescriptorHandleForHeapStart(),
 			pGui->pSrvHeap->GetGPUDescriptorHandleForHeapStart()
 		);
+		pGui->pSwapChain = pSwapChain;
 		*ppGui = pGui;
 	}
 	void RemoveGUI(GUI* pGui) {
@@ -81,10 +82,11 @@ namespace Rainbow {
 		ImGui::NewFrame();
 	}
 
-	void GUIDraw(GUI* pGui,ID3D12GraphicsCommandList* ctx) {
+	void GUIDraw(GUI* pGui) {
 		ImGui::Render();
-		ctx->SetDescriptorHeaps(1, (ID3D12DescriptorHeap* const*)&pGui->pSrvHeap);
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), ctx);
+		auto frameIndex = pGui->pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+		pGui->pSwapChain->cmd[frameIndex]->pDxCmdList->SetDescriptorHeaps(1, (ID3D12DescriptorHeap* const*)&pGui->pSrvHeap);
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), pGui->pSwapChain->cmd[frameIndex]->pDxCmdList);
 	}
 
 	LRESULT GUIWndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {

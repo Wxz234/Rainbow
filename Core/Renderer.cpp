@@ -25,6 +25,8 @@ namespace Rainbow {
 	void CreateDevice(Device** ppDevice) {
 		assert(ppDevice);
 
+		CoInitialize(NULL);
+
 		Device* pDevice = new Device;
 		IDXGIFactory7* temp_factory = nullptr;
 #ifdef _DEBUG
@@ -53,12 +55,19 @@ namespace Rainbow {
 		Queue* pQueue = nullptr;
 		CreateQueue(pDevice, &queueDesc, &pQueue);
 		pDevice->pQueue = pQueue;
+		
+		CmdPoolDesc poolDesc{ COMMAND_TYPE_GRAPHICS };
+		CreateCmdPool(pDevice, &poolDesc, &pDevice->pPool);
+		CmdDesc cmdDesc{ COMMAND_TYPE_GRAPHICS, pDevice->pPool };
+		CreateCmd(pDevice, &cmdDesc, &pDevice->pCmd);
 		*ppDevice = pDevice;
 	}
 
 	void RemoveDevice(Device* pDevice) {
 		assert(pDevice);
 		RemoveQueue(pDevice->pQueue);
+		RemoveCmdPool(pDevice->pPool);
+		RemoveCmd(pDevice->pCmd);
 		pDevice->pResourceAllocator->Release();
 		pDevice->pDxDevice->Release();
 		pDevice->pDxActiveGPU->Release();
@@ -387,7 +396,7 @@ namespace Rainbow {
 			pDesc->mState, NULL,
 		&pTexture->pAllocation, IID_PPV_ARGS(&resource));
 		resource->Release();
-		pTexture->pDxSrv = nullptr;
+		//pTexture->pDxSrv = nullptr;
 		*ppTexture = pTexture;
 	}
 
@@ -399,16 +408,28 @@ namespace Rainbow {
 		std::string file_str = file;
 		std::filesystem::path my_path{ file };	//	
 		ID3D12Resource* _tex;
+		std::unique_ptr<uint8_t[]> picData;
+		D3D12_SUBRESOURCE_DATA subresources;
+		DirectX::LoadWICTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, picData, subresources);
+		auto resDesc = _tex->GetDesc();
 
-		std::unique_ptr<uint8_t[]> ddsData;
-		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-		if (file_str.ends_with(".dds")) {
-			DirectX::LoadDDSTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources);
-		}
-		else {
-			subresources.resize(1);
-			DirectX::LoadWICTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources[0]);
-		}
+		D3D12MA::ALLOCATION_DESC allocDesc = {};
+		allocDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+		ID3D12Resource* resource;
+		pDevice->pResourceAllocator->CreateResource(
+			&allocDesc, &resDesc,
+			D3D12_RESOURCE_STATE_COPY_SOURCE, NULL,
+			&pTexture->pAllocation, IID_PPV_ARGS(&resource));
+
+		CmdReset(pDevice->pCmd);
+		pDevice->pCmd->pDxCmdList->CopyResource(_tex, resource);
+		CmdResourceBarrier(pDevice->pCmd, resource, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COMMON);
+		CmdClose(pDevice->pCmd);
+		QueueExecute(pDevice->pQueue, pDevice->pCmd);
+		QueueWait(pDevice->pQueue);
+		_tex->Release();
+		resource->Release();
+		*ppTexture = pTexture;
 	}
 
 	//void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture) {
@@ -438,9 +459,6 @@ namespace Rainbow {
 	void RemoveTexture(Texture* pTexture) {
 		assert(pTexture);
 		pTexture->pAllocation->Release();
-		if (pTexture->pDxSrv) {
-			pTexture->pDxSrv->Release();
-		}
 		delete pTexture;
 	}
 }
