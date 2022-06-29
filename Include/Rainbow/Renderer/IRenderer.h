@@ -13,6 +13,7 @@
 #include <dxgi1_6.h>
 #include <cstdint>
 #include <handleapi.h>
+#include <vector>
 
 namespace D3D12MA {
 	class Allocator;
@@ -55,30 +56,6 @@ namespace Rainbow {
 	void RemoveQueue(Queue* pQueue);
 	void QueueWait(Queue* pQueue);
 
-	struct SwapChain {
-		IDXGISwapChain4* pDxSwapChain;
-		ID3D12DescriptorHeap* pDxRTVHeap;
-		uint64_t* pFenceValue;
-		uint32_t mDescriptorSize;
-		Device* pDevice;
-	};
-
-	struct SwapChainDesc {
-		WindowHandle mWindowHandle;
-		uint32_t mImageCount;
-		uint32_t mWidth;
-		uint32_t mHeight;
-		DXGI_FORMAT mColorFormat;
-	};
-
-	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
-	void RemoveSwapChain(SwapChain* pSwapChain);
-	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
-	void GetSwapChainBuffer(SwapChain* pSwapChain, uint32_t index,ID3D12Resource **ppRes);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain);
-	void SwapChainPresent(SwapChain* pSwapChain);
-
 	struct CmdPool {
 		ID3D12CommandAllocator* pDxCmdAlloc;
 	};
@@ -109,20 +86,32 @@ namespace Rainbow {
 
 	void QueueExecute(Queue* pQueue, Cmd* pCmd);
 
-	struct Texture {
-		D3D12MA::Allocation* pAllocation;
-		ID3D12DescriptorHeap* pSrv;
+	struct SwapChain {
+		IDXGISwapChain4* pDxSwapChain;
+		ID3D12DescriptorHeap* pDxRTVHeap;
+		uint64_t* pFenceValue;
+		uint32_t mDescriptorSize;
+		Device* pDevice;
+		std::vector<CmdPool*> cmdPool;
+		std::vector<Cmd*> cmd;
 	};
 
-	struct TextureDesc {
+	struct SwapChainDesc {
+		WindowHandle mWindowHandle;
+		uint32_t mImageCount;
 		uint32_t mWidth;
 		uint32_t mHeight;
-		uint16_t mMipLevels;
-		DXGI_FORMAT mFormat;
-		D3D12_RESOURCE_FLAGS mFlags;
+		DXGI_FORMAT mColorFormat;
 	};
 
-	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture);
-	void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture);
-	void RemoveTexture(Texture* pTexture);
+	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
+	void RemoveSwapChain(SwapChain* pSwapChain);
+	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
+	void GetSwapChainBuffer(SwapChain* pSwapChain, uint32_t index, ID3D12Resource** ppRes);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain);
+	void SwapChainPresent(SwapChain* pSwapChain);
+	
+	void BeginDraw(Device* pDevice, SwapChain* pSwapChain);
+	void EndDraw(Device* pDevice, SwapChain* pSwapChain);
 }

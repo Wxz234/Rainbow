@@ -17,6 +17,8 @@ Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
 
 void Draw() {
+	Rainbow::BeginDraw(pDevice, pSwapChain);
+	Rainbow::EndDraw(pDevice, pSwapChain);
 	Rainbow::SwapChainPresent(pSwapChain);
 }
 

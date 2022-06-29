@@ -175,6 +175,14 @@ namespace Rainbow {
 		pSwapChain->pDxSwapChain->QueryInterface(&pDevice->pQueue->pSubmitSwapChain);
 		pSwapChain->pFenceValue = new uint64_t[pDesc->mImageCount]{};
 		pSwapChain->pDevice = pDevice;
+		pSwapChain->cmdPool.resize(pDesc->mImageCount);
+		pSwapChain->cmd.resize(pDesc->mImageCount);
+		CmdPoolDesc poolDesc{ COMMAND_TYPE_GRAPHICS };
+		for (uint32_t i = 0;i < pDesc->mImageCount; ++i) {
+			CreateCmdPool(pSwapChain->pDevice, &poolDesc, &(pSwapChain->cmdPool[i]));
+			CmdDesc cmdDesc{ COMMAND_TYPE_GRAPHICS, pSwapChain->cmdPool[i] };
+			CreateCmd(pSwapChain->pDevice, &cmdDesc, &(pSwapChain->cmd[i]));
+		}
 		*ppSwapChain = pSwapChain;
 	}
 
@@ -183,6 +191,10 @@ namespace Rainbow {
 		pSwapChain->pDxSwapChain->Release();
 		pSwapChain->pDxRTVHeap->Release();
 		delete[]pSwapChain->pFenceValue;
+		for (uint32_t i = 0; i < pSwapChain->cmdPool.size(); ++i) {
+			RemoveCmdPool(pSwapChain->cmdPool[i]);
+			RemoveCmd(pSwapChain->cmd[i]);
+		}
 		delete pSwapChain;
 	}
 
@@ -341,6 +353,25 @@ namespace Rainbow {
 		assert(ppRes);
 
 		pSwapChain->pDxSwapChain->GetBuffer(index, IID_PPV_ARGS(ppRes));
+	}
+
+	void BeginDraw(Device* pDevice, SwapChain* pSwapChain) {
+		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+		pSwapChain->cmd[frameIndex]->pDxCmdAlloc->Reset();
+		pSwapChain->cmd[frameIndex]->pDxCmdList->Reset(pSwapChain->cmd[frameIndex]->pDxCmdAlloc, nullptr);
+		ID3D12Resource* _res = nullptr;
+		pSwapChain->pDxSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&_res));
+		CmdResourceBarrier(pSwapChain->cmd[frameIndex], _res, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		_res->Release();
+	}
+	void EndDraw(Device* pDevice, SwapChain* pSwapChain) {
+		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+		ID3D12Resource* _res = nullptr;
+		pSwapChain->pDxSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&_res));
+		CmdResourceBarrier(pSwapChain->cmd[frameIndex], _res, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		pSwapChain->cmd[frameIndex]->pDxCmdList->Close();
+		QueueExecute(pDevice->pQueue, pSwapChain->cmd[frameIndex]);
+		_res->Release();
 	}
 
 	//void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture) {
