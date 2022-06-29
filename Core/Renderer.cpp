@@ -8,12 +8,16 @@
 #include "../Include/Rainbow/Renderer/IRenderer.h"
 
 #include "../ThirdParty/D3D12MemoryAllocator/include/D3D12MemAlloc.h"
+#include "../ThirdParty/DirectXTex/DDSTextureLoader/DDSTextureLoader12.h"
+#include "../ThirdParty/DirectXTex/WICTextureLoader/WICTextureLoader12.h"
 
 #include <d3d12sdklayers.h>
 #include <winerror.h>
 #include <combaseapi.h>
 #include <synchapi.h>
 #include <cassert>
+#include <string>
+#include <filesystem>
 
 #pragma warning (disable: 4838 6011)
 
@@ -45,14 +49,20 @@ namespace Rainbow {
 		desc.pAdapter = pDevice->pDxActiveGPU;
 		D3D12MA::CreateAllocator(&desc, &pDevice->pResourceAllocator);
 
+		QueueDesc queueDesc{ COMMAND_TYPE_GRAPHICS };
+		Queue* pQueue = nullptr;
+		CreateQueue(pDevice, &queueDesc, &pQueue);
+		pDevice->pQueue = pQueue;
 		*ppDevice = pDevice;
 	}
 
 	void RemoveDevice(Device* pDevice) {
 		assert(pDevice);
+		RemoveQueue(pDevice->pQueue);
 		pDevice->pResourceAllocator->Release();
 		pDevice->pDxDevice->Release();
 		pDevice->pDxActiveGPU->Release();
+
 		delete pDevice;
 	}
 
@@ -347,22 +357,45 @@ namespace Rainbow {
 		allocDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
 
 		ID3D12Resource* resource;
-		D3D12MA::Allocation* allocation;
 		HRESULT hr = pDevice->pResourceAllocator->CreateResource(
 			&allocDesc, &resourceDesc,
 			D3D12_RESOURCE_STATE_COPY_DEST, NULL,
-			&allocation, IID_PPV_ARGS(&resource));
+			&pTexture->pAllocation, IID_PPV_ARGS(&resource));
+		D3D12_DESCRIPTOR_HEAP_DESC heapDesc{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 0 };
 
+		pDevice->pDxDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&pTexture->pSrv));
+		pDevice->pDxDevice->CreateShaderResourceView(resource, nullptr, pTexture->pSrv->GetCPUDescriptorHandleForHeapStart());
+		resource->Release();
 		*ppTexture = pTexture;
 	}
 
 	void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture) {
+		assert(pDevice);
+		assert(file);
+		assert(ppTexture);
 
+		Texture* pTexture = new Texture;
+
+		std::string file_str = file;
+		std::filesystem::path my_path{ file };
+		ID3D12Resource* _tex;
+
+		std::unique_ptr<uint8_t[]> ddsData;
+		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+		if (file_str.ends_with(".dds")) {
+			//DirectX::LoadDDSTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources);
+		}
+		else {
+			subresources.resize(1);
+			//DirectX::LoadWICTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources[0]);
+		}
+
+		*ppTexture = pTexture;
 	}
 
 	void RemoveTexture(Texture* pTexture) {
 		assert(pTexture);
-		pTexture->pAllocation->Release();
+		//pTexture->pAllocation->Release();
 		delete pTexture;
 	}
 }

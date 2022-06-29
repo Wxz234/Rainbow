@@ -28,15 +28,6 @@ namespace Rainbow {
 		COMMAND_TYPE_COMPUTE,
 	};
 
-	struct Device {
-		IDXGIAdapter4* pDxActiveGPU;
-		ID3D12Device7* pDxDevice;
-		D3D12MA::Allocator* pResourceAllocator;
-	};
-
-	void CreateDevice(Device** ppDevice);
-	void RemoveDevice(Device* pDevice);
-
 	struct Queue {
 		ID3D12CommandQueue* pDxQueue;
 		ID3D12Fence* pDxFence;
@@ -44,6 +35,17 @@ namespace Rainbow {
 		uint64_t mFenceValue;
 		IDXGISwapChain* pSubmitSwapChain;
 	};
+
+	struct Device {
+		IDXGIAdapter4* pDxActiveGPU;
+		ID3D12Device7* pDxDevice;
+		D3D12MA::Allocator* pResourceAllocator;
+
+		Queue* pQueue;
+	};
+
+	void CreateDevice(Device** ppDevice);
+	void RemoveDevice(Device* pDevice);
 
 	struct QueueDesc {
 		CommandType mType;
@@ -108,6 +110,7 @@ namespace Rainbow {
 
 	struct Texture {
 		D3D12MA::Allocation* pAllocation;
+		ID3D12DescriptorHeap* pSrv;
 	};
 
 	struct TextureDesc {
