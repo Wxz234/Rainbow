@@ -355,6 +355,11 @@ namespace Rainbow {
 
 		*ppTexture = pTexture;
 	}
+
+	void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture) {
+
+	}
+
 	void RemoveTexture(Texture* pTexture) {
 		assert(pTexture);
 		pTexture->pAllocation->Release();

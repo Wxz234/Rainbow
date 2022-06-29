@@ -6,6 +6,13 @@ set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(ThirdParty/D3D12MemoryAllocator)
 set_property(TARGET D3D12MemoryAllocator PROPERTY FOLDER "ThirdParty")
 
+set(BUILD_TOOLS OFF)
+set(BUILD_SAMPLE OFF)
+set(BUILD_DX11 OFF)
+set(BC_USE_OPENMP OFF)
+add_subdirectory(ThirdParty/DirectXTex)
+set_property(TARGET DirectXTex PROPERTY FOLDER "ThirdParty")
+
 add_library(imgui STATIC 
 	ThirdParty/imgui/backends/imgui_impl_win32.cpp
 	ThirdParty/imgui/backends/imgui_impl_win32.h
@@ -36,5 +43,5 @@ add_executable(RainbowEditor WIN32 Editor/Editor.cpp)
 target_compile_definitions(RainbowEditor PRIVATE UNICODE _UNICODE)
 target_compile_definitions(RainbowEditor PRIVATE RAINBOW_PATH="${PROJECT_SOURCE_DIR}/")
 target_link_libraries(RainbowEditor PRIVATE RainbowCore RainbowRuntime)
-target_link_libraries(RainbowEditor PRIVATE D3D12MemoryAllocator imgui)
+target_link_libraries(RainbowEditor PRIVATE D3D12MemoryAllocator DirectXTex imgui)
 target_link_libraries(RainbowEditor PRIVATE d3d12.lib dxgi.lib dxguid.lib)
