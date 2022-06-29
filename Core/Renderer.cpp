@@ -391,29 +391,25 @@ namespace Rainbow {
 		*ppTexture = pTexture;
 	}
 
-	//void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture) {
-	//	assert(pDevice);
-	//	assert(pDesc);
-	//	assert(ppTexture);
-	//	Texture* pTexture = new Texture;
+	void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture) {
+		assert(pDevice);
+		assert(file);
+		assert(ppTexture);
+		Texture* pTexture = new Texture;
+		std::string file_str = file;
+		std::filesystem::path my_path{ file };	//	
+		ID3D12Resource* _tex;
 
-	//	D3D12_RESOURCE_DESC resourceDesc{ D3D12_RESOURCE_DIMENSION_TEXTURE2D, 0, pDesc->mWidth, pDesc->mHeight, 1, pDesc->mMipLevels, pDesc->mFormat,{ 1, 0 }, D3D12_TEXTURE_LAYOUT_UNKNOWN, pDesc->mFlags };
-
-	//	D3D12MA::ALLOCATION_DESC allocDesc = {};
-	//	allocDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
-
-	//	ID3D12Resource* resource;
-	//	HRESULT hr = pDevice->pResourceAllocator->CreateResource(
-	//		&allocDesc, &resourceDesc,
-	//		D3D12_RESOURCE_STATE_COPY_DEST, NULL,
-	//		&pTexture->pAllocation, IID_PPV_ARGS(&resource));
-	//	D3D12_DESCRIPTOR_HEAP_DESC heapDesc{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 0 };
-
-	//	pDevice->pDxDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&pTexture->pSrv));
-	//	pDevice->pDxDevice->CreateShaderResourceView(resource, nullptr, pTexture->pSrv->GetCPUDescriptorHandleForHeapStart());
-	//	resource->Release();
-	//	*ppTexture = pTexture;
-	//}
+		std::unique_ptr<uint8_t[]> ddsData;
+		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+		if (file_str.ends_with(".dds")) {
+			DirectX::LoadDDSTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources);
+		}
+		else {
+			subresources.resize(1);
+			DirectX::LoadWICTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources[0]);
+		}
+	}
 
 	//void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture) {
 	//	assert(pDevice);
