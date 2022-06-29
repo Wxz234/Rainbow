@@ -7,8 +7,10 @@
 
 #include "../Include/Rainbow/Window/Window.h"
 #include "../Include/Rainbow/Renderer/IRenderer.h"
+#include "../Include/Rainbow/GUI/GUI.h"
 
 #include <Windows.h>
+
 uint32_t w = 800, h = 600;
 constexpr uint32_t frameCount = 3;
 Rainbow::Device* pDevice = nullptr;
