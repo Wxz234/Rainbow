@@ -8,6 +8,7 @@
 #include "../Include/Rainbow/Window/Window.h"
 #include "../Include/Rainbow/Renderer/IRenderer.h"
 #include "../Include/Rainbow/GUI/GUI.h"
+#include "../Include/Rainbow/Runtime/Scene.h"
 
 #include <Windows.h>
 
@@ -17,7 +18,12 @@ Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
 
 void Draw() {
+	Rainbow::Texture* pTex = nullptr;
+	Rainbow::TextureDesc texDesc{ 800, 600, 1, DXGI_FORMAT_R8G8B8A8_UNORM, D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET };
+	Rainbow::CreateTexture(pDevice, &texDesc, &pTex);
+	Rainbow::RemoveTexture(pTex);
 	Rainbow::BeginDraw(pDevice, pSwapChain);
+
 	Rainbow::EndDraw(pDevice, pSwapChain);
 	Rainbow::SwapChainPresent(pSwapChain);
 }
