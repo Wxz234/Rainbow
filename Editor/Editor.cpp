@@ -18,7 +18,6 @@ uint32_t width = 1024, height = 768;
 constexpr uint32_t frameCount = 3;
 Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
-Rainbow::Queue* pQueue = nullptr;
 Rainbow::GUI* pGui = nullptr;
 Rainbow::CmdPool* pCmdPool[frameCount]{};
 Rainbow::Cmd* pCmd[frameCount]{};
@@ -34,7 +33,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		width = LOWORD(lParam);
 		height = HIWORD(lParam);
 
-		QueueWait(pQueue);
+		Rainbow::QueueWait(pDevice->pQueue);
 		Rainbow::SwapChainResize(pSwapChain, width, height, DXGI_FORMAT_UNKNOWN);
 
 		break;
@@ -143,10 +142,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	auto hwnd = CreateWindowExW(0, L"RainbowEditor", L"RainbowEditor", stype, 10, 10, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, GetModuleHandle(nullptr), nullptr);
 
 	Rainbow::CreateDevice(&pDevice);
-	Rainbow::QueueDesc queueDesc = { Rainbow::COMMAND_TYPE_GRAPHICS };
-	Rainbow::CreateQueue(pDevice, &queueDesc, &pQueue);
 	Rainbow::SwapChainDesc swapchainDesc{ hwnd, frameCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM };
-	Rainbow::CreateSwapChain(pQueue, &swapchainDesc, &pSwapChain);
+	Rainbow::CreateSwapChain(pDevice->pQueue, &swapchainDesc, &pSwapChain);
 	Rainbow::CreateGUI(pDevice, pSwapChain, &pGui);
 
 	auto path = RAINBOW_PATH + std::string("Config/editor_imgui.ini");
@@ -196,16 +193,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 			Rainbow::CmdResourceBarrier(pCmd[frameIndex], res, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
 			Rainbow::CmdClose(pCmd[frameIndex]);
-			Rainbow::QueueExecute(pQueue, pCmd[frameIndex]);
+			Rainbow::QueueExecute(pDevice->pQueue, pCmd[frameIndex]);
 
-			Rainbow::QueuePresent(pQueue, pSwapChain);
+			Rainbow::QueuePresent(pDevice->pQueue, pSwapChain);
 
 			res->Release();
 		}
 	}
 
 	// must release queue firstly.
-	Rainbow::RemoveQueue(pQueue);
+	Rainbow::RemoveDevice(pDevice);
 	Rainbow::RemoveSwapChain(pSwapChain);
 
 	for (uint32_t i = 0; i < frameCount; ++i) {
@@ -214,7 +211,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	}
 
 	Rainbow::RemoveGUI(pGui);
-	Rainbow::RemoveDevice(pDevice);
 
 	return 0;
 }
