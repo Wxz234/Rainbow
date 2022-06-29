@@ -118,8 +118,8 @@ namespace Rainbow {
 		}
 	}
 
-	void CreateSwapChain(Queue* pQueue, SwapChainDesc* pDesc, SwapChain** ppSwapChain) {
-		assert(pQueue);
+	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain) {
+		assert(pDevice);
 		assert(pDesc);
 		assert(ppSwapChain);
 		SwapChain* pSwapChain = new SwapChain;
@@ -146,36 +146,35 @@ namespace Rainbow {
 		CreateDXGIFactory2(0, IID_PPV_ARGS(&temp_factory));
 #endif
 		IDXGISwapChain1* temp_swapchain = nullptr;
-		temp_factory->CreateSwapChainForHwnd(pQueue->pDxQueue, (HWND)pDesc->mWindowHandle.window, &_desc, &fsSwapChainDesc, nullptr, &temp_swapchain);
+		temp_factory->CreateSwapChainForHwnd(pDevice->pQueue->pDxQueue, (HWND)pDesc->mWindowHandle.window, &_desc, &fsSwapChainDesc, nullptr, &temp_swapchain);
 		temp_swapchain->QueryInterface(&pSwapChain->pDxSwapChain);
 		temp_factory->MakeWindowAssociation((HWND)pDesc->mWindowHandle.window, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
 		
 		temp_factory->Release();
 		temp_swapchain->Release();
 		// rtv
-		ID3D12Device* temp_device = nullptr;
-		pQueue->pDxQueue->GetDevice(IID_PPV_ARGS(&temp_device));
+		//ID3D12Device* temp_device = nullptr;
+
 		D3D12_DESCRIPTOR_HEAP_DESC heapdesc = {};
 		heapdesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		heapdesc.NumDescriptors = pDesc->mImageCount;
 		heapdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		temp_device->CreateDescriptorHeap(&heapdesc, IID_PPV_ARGS(&pSwapChain->pDxRTVHeap));
+		pDevice->pDxDevice->CreateDescriptorHeap(&heapdesc, IID_PPV_ARGS(&pSwapChain->pDxRTVHeap));
 
-		pSwapChain->mDescriptorSize = temp_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		pSwapChain->mDescriptorSize = pDevice->pDxDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = pSwapChain->pDxRTVHeap->GetCPUDescriptorHandleForHeapStart();
 		for (uint32_t i = 0; i < pDesc->mImageCount; i++)
 		{
 			ID3D12Resource* pBackBuffer = nullptr;
 			pSwapChain->pDxSwapChain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
-			temp_device->CreateRenderTargetView(pBackBuffer, NULL, rtvHandle);
+			pDevice->pDxDevice->CreateRenderTargetView(pBackBuffer, NULL, rtvHandle);
 			rtvHandle.ptr += pSwapChain->mDescriptorSize;
 			pBackBuffer->Release();
 		}
 
-		temp_device->Release();
-		pSwapChain->pDxSwapChain->QueryInterface(&pQueue->pSubmitSwapChain);
+		pSwapChain->pDxSwapChain->QueryInterface(&pDevice->pQueue->pSubmitSwapChain);
 		pSwapChain->pFenceValue = new uint64_t[pDesc->mImageCount]{};
-
+		pSwapChain->pDevice = pDevice;
 		*ppSwapChain = pSwapChain;
 	}
 
@@ -227,23 +226,22 @@ namespace Rainbow {
 		return rtvHandle;
 	}
 
-	void QueuePresent(Queue* pQueue, SwapChain* pSwapChain) {
-		assert(pQueue->pSubmitSwapChain == pSwapChain->pDxSwapChain);
-
+	void SwapChainPresent(SwapChain* pSwapChain) {
+		assert(pSwapChain);
 		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
-		pSwapChain->pFenceValue[frameIndex] = pQueue->mFenceValue++;
+		pSwapChain->pFenceValue[frameIndex] = pSwapChain->pDevice->pQueue->mFenceValue++;
 
 		pSwapChain->pDxSwapChain->Present(1, 0);
 
 		const uint64_t currentFenceValue = pSwapChain->pFenceValue[frameIndex];
-		pQueue->pDxQueue->Signal(pQueue->pDxFence, currentFenceValue);
+		pSwapChain->pDevice->pQueue->pDxQueue->Signal(pSwapChain->pDevice->pQueue->pDxFence, currentFenceValue);
 
 		frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
 
-		if (pQueue->pDxFence->GetCompletedValue() < pSwapChain->pFenceValue[frameIndex])
+		if (pSwapChain->pDevice->pQueue->pDxFence->GetCompletedValue() < pSwapChain->pFenceValue[frameIndex])
 		{
-			pQueue->pDxFence->SetEventOnCompletion(pSwapChain->pFenceValue[frameIndex], pQueue->pDxWaitIdleFenceEvent);
-			WaitForSingleObjectEx(pQueue->pDxWaitIdleFenceEvent, INFINITE, FALSE);
+			pSwapChain->pDevice->pQueue->pDxFence->SetEventOnCompletion(pSwapChain->pFenceValue[frameIndex], pSwapChain->pDevice->pQueue->pDxWaitIdleFenceEvent);
+			WaitForSingleObjectEx(pSwapChain->pDevice->pQueue->pDxWaitIdleFenceEvent, INFINITE, FALSE);
 		}
 	}
 
@@ -345,57 +343,57 @@ namespace Rainbow {
 		pSwapChain->pDxSwapChain->GetBuffer(index, IID_PPV_ARGS(ppRes));
 	}
 
-	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture) {
-		assert(pDevice);
-		assert(pDesc);
-		assert(ppTexture);
-		Texture* pTexture = new Texture;
+	//void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture) {
+	//	assert(pDevice);
+	//	assert(pDesc);
+	//	assert(ppTexture);
+	//	Texture* pTexture = new Texture;
 
-		D3D12_RESOURCE_DESC resourceDesc{ D3D12_RESOURCE_DIMENSION_TEXTURE2D, 0, pDesc->mWidth, pDesc->mHeight, 1, pDesc->mMipLevels, pDesc->mFormat,{ 1, 0 }, D3D12_TEXTURE_LAYOUT_UNKNOWN, pDesc->mFlags };
+	//	D3D12_RESOURCE_DESC resourceDesc{ D3D12_RESOURCE_DIMENSION_TEXTURE2D, 0, pDesc->mWidth, pDesc->mHeight, 1, pDesc->mMipLevels, pDesc->mFormat,{ 1, 0 }, D3D12_TEXTURE_LAYOUT_UNKNOWN, pDesc->mFlags };
 
-		D3D12MA::ALLOCATION_DESC allocDesc = {};
-		allocDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+	//	D3D12MA::ALLOCATION_DESC allocDesc = {};
+	//	allocDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
 
-		ID3D12Resource* resource;
-		HRESULT hr = pDevice->pResourceAllocator->CreateResource(
-			&allocDesc, &resourceDesc,
-			D3D12_RESOURCE_STATE_COPY_DEST, NULL,
-			&pTexture->pAllocation, IID_PPV_ARGS(&resource));
-		D3D12_DESCRIPTOR_HEAP_DESC heapDesc{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 0 };
+	//	ID3D12Resource* resource;
+	//	HRESULT hr = pDevice->pResourceAllocator->CreateResource(
+	//		&allocDesc, &resourceDesc,
+	//		D3D12_RESOURCE_STATE_COPY_DEST, NULL,
+	//		&pTexture->pAllocation, IID_PPV_ARGS(&resource));
+	//	D3D12_DESCRIPTOR_HEAP_DESC heapDesc{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 0 };
 
-		pDevice->pDxDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&pTexture->pSrv));
-		pDevice->pDxDevice->CreateShaderResourceView(resource, nullptr, pTexture->pSrv->GetCPUDescriptorHandleForHeapStart());
-		resource->Release();
-		*ppTexture = pTexture;
-	}
+	//	pDevice->pDxDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&pTexture->pSrv));
+	//	pDevice->pDxDevice->CreateShaderResourceView(resource, nullptr, pTexture->pSrv->GetCPUDescriptorHandleForHeapStart());
+	//	resource->Release();
+	//	*ppTexture = pTexture;
+	//}
 
-	void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture) {
-		assert(pDevice);
-		assert(file);
-		assert(ppTexture);
+	//void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture) {
+	//	assert(pDevice);
+	//	assert(file);
+	//	assert(ppTexture);
 
-		Texture* pTexture = new Texture;
+	//	Texture* pTexture = new Texture;
 
-		std::string file_str = file;
-		std::filesystem::path my_path{ file };
-		ID3D12Resource* _tex;
+	//	std::string file_str = file;
+	//	std::filesystem::path my_path{ file };
+	//	ID3D12Resource* _tex;
 
-		std::unique_ptr<uint8_t[]> ddsData;
-		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-		if (file_str.ends_with(".dds")) {
-			//DirectX::LoadDDSTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources);
-		}
-		else {
-			subresources.resize(1);
-			//DirectX::LoadWICTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources[0]);
-		}
+	//	std::unique_ptr<uint8_t[]> ddsData;
+	//	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+	//	if (file_str.ends_with(".dds")) {
+	//		//DirectX::LoadDDSTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources);
+	//	}
+	//	else {
+	//		subresources.resize(1);
+	//		//DirectX::LoadWICTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, ddsData, subresources[0]);
+	//	}
 
-		*ppTexture = pTexture;
-	}
+	//	*ppTexture = pTexture;
+	//}
 
-	void RemoveTexture(Texture* pTexture) {
-		assert(pTexture);
-		//pTexture->pAllocation->Release();
-		delete pTexture;
-	}
+	//void RemoveTexture(Texture* pTexture) {
+	//	assert(pTexture);
+	//	//pTexture->pAllocation->Release();
+	//	delete pTexture;
+	//}
 }

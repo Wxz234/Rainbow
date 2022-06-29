@@ -60,6 +60,7 @@ namespace Rainbow {
 		ID3D12DescriptorHeap* pDxRTVHeap;
 		uint64_t* pFenceValue;
 		uint32_t mDescriptorSize;
+		Device* pDevice;
 	};
 
 	struct SwapChainDesc {
@@ -70,13 +71,13 @@ namespace Rainbow {
 		DXGI_FORMAT mColorFormat;
 	};
 
-	void CreateSwapChain(Queue* pQueue, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
+	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
 	void RemoveSwapChain(SwapChain* pSwapChain);
 	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
 	void GetSwapChainBuffer(SwapChain* pSwapChain, uint32_t index,ID3D12Resource **ppRes);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain);
-	void QueuePresent(Queue* pQueue, SwapChain* pSwapChain);
+	void SwapChainPresent(SwapChain* pSwapChain);
 
 	struct CmdPool {
 		ID3D12CommandAllocator* pDxCmdAlloc;
