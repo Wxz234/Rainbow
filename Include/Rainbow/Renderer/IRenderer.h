@@ -130,4 +130,7 @@ namespace Rainbow {
 		D3D12_RESOURCE_STATES mState;
 		D3D12_RESOURCE_FLAGS mFlags;
 	};
+
+	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture);
+	void RemoveTexture(Texture* pTexture);
 }
