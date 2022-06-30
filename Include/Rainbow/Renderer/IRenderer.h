@@ -47,6 +47,10 @@ namespace Rainbow {
 		CmdPool* pPool;
 	};
 
+	void CmdReset(Cmd* pCmd);
+	void CmdClose(Cmd* pCmd);
+	void CmdResourceBarrier(Cmd* pCmd, ID3D12Resource* pRes, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
+
 	struct Queue {
 		ID3D12CommandQueue* pDxQueue;
 		ID3D12Fence* pDxFence;
@@ -54,6 +58,13 @@ namespace Rainbow {
 		uint64_t mFenceValue;
 		IDXGISwapChain* pSubmitSwapChain;
 	};
+
+	struct QueueDesc {
+		CommandType mType;
+	};
+
+	void QueueExecute(Queue* pQueue, Cmd* pCmd);
+	void QueueWait(Queue* pQueue);
 
 	struct Device {
 		IDXGIAdapter4* pDxActiveGPU;
@@ -69,25 +80,14 @@ namespace Rainbow {
 	void CreateDevice(Device** ppDevice);
 	void RemoveDevice(Device* pDevice);
 
-	struct QueueDesc {
-		CommandType mType;
-	};
-
 	void CreateQueue(Device* pDevice, QueueDesc* pDesc, Queue** ppQueue);
 	void RemoveQueue(Queue* pQueue);
-	void QueueWait(Queue* pQueue);
 
 	void CreateCmdPool(Device* pDevice, CmdPoolDesc* pDesc, CmdPool** ppCmdPool);
 	void RemoveCmdPool(CmdPool* pCmdPool);
 
 	void CreateCmd(Device* pDevice, CmdDesc* pDesc, Cmd** ppCmd);
 	void RemoveCmd(Cmd* pCmd);
-
-	void CmdReset(Cmd* pCmd);
-	void CmdClose(Cmd* pCmd);
-	void CmdResourceBarrier(Cmd* pCmd, ID3D12Resource* pRes, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
-
-	void QueueExecute(Queue* pQueue, Cmd* pCmd);
 
 	struct SwapChain {
 		IDXGISwapChain4* pDxSwapChain;
@@ -109,8 +109,8 @@ namespace Rainbow {
 
 	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
 	void RemoveSwapChain(SwapChain* pSwapChain);
+
 	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
-	void GetSwapChainBuffer(SwapChain* pSwapChain, uint32_t index, ID3D12Resource** ppRes);
 	Cmd* GetSwapChainActiveList(SwapChain* pSwapChain);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain);
 	void SwapChainPresent(SwapChain* pSwapChain);

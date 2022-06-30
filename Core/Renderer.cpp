@@ -361,13 +361,6 @@ namespace Rainbow {
 		pQueue->pDxQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&pCmd->pDxCmdList);
 	}
 
-	void GetSwapChainBuffer(SwapChain* pSwapChain, uint32_t index, ID3D12Resource** ppRes) {
-		assert(pSwapChain);
-		assert(ppRes);
-
-		pSwapChain->pDxSwapChain->GetBuffer(index, IID_PPV_ARGS(ppRes));
-	}
-
 	void BeginDraw(Device* pDevice, SwapChain* pSwapChain) {
 		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
 		pSwapChain->cmd[frameIndex]->pDxCmdAlloc->Reset();
