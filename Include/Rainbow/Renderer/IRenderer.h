@@ -117,4 +117,17 @@ namespace Rainbow {
 	
 	void BeginDraw(Device* pDevice, SwapChain* pSwapChain);
 	void EndDraw(Device* pDevice, SwapChain* pSwapChain);
+
+	struct Texture {
+		D3D12MA::Allocation* pAllocation;
+	};
+
+	struct TextureDesc {
+		uint32_t mWidth;
+		uint32_t mHeight;
+		uint16_t mMipLevels;
+		DXGI_FORMAT mFormat;
+		D3D12_RESOURCE_STATES mState;
+		D3D12_RESOURCE_FLAGS mFlags;
+	};
 }
