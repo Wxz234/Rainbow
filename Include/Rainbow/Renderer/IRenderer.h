@@ -120,6 +120,7 @@ namespace Rainbow {
 
 	struct Texture {
 		D3D12MA::Allocation* pAllocation;
+		ID3D12Resource* test;
 	};
 
 	struct TextureDesc {

@@ -415,7 +415,7 @@ namespace Rainbow {
 		ID3D12Resource* _tex;
 		std::unique_ptr<uint8_t[]> picData;
 		D3D12_SUBRESOURCE_DATA subresources;
-		DirectX::LoadWICTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, picData, subresources);
+		auto pp = DirectX::LoadWICTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, picData, subresources);
 		auto resDesc = _tex->GetDesc();
 
 		D3D12MA::ALLOCATION_DESC allocDesc = {};
@@ -429,10 +429,12 @@ namespace Rainbow {
 		CmdReset(pDevice->pCmd);
 		pDevice->pCmd->pDxCmdList->CopyResource(_tex, resource);
 		CmdResourceBarrier(pDevice->pCmd, resource, D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_COMMON);
+		CmdResourceBarrier(pDevice->pCmd, _tex, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COMMON);
 		CmdClose(pDevice->pCmd);
 		QueueExecute(pDevice->pQueue, pDevice->pCmd);
 		QueueWait(pDevice->pQueue);
-		_tex->Release();
+		//_tex->Release();
+		pTexture->test = _tex;
 		resource->Release();
 		*ppTexture = pTexture;
 	}
