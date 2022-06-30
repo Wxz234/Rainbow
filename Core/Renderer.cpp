@@ -370,6 +370,7 @@ namespace Rainbow {
 		CmdResourceBarrier(pSwapChain->cmd[frameIndex], _res, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 		_res->Release();
 	}
+
 	void EndDraw(Device* pDevice, SwapChain* pSwapChain) {
 		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
 		ID3D12Resource* _res = nullptr;
@@ -378,5 +379,28 @@ namespace Rainbow {
 		pSwapChain->cmd[frameIndex]->pDxCmdList->Close();
 		QueueExecute(pDevice->pQueue, pSwapChain->cmd[frameIndex]);
 		_res->Release();
+	}
+
+	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture) {
+		assert(pDevice);
+		assert(pDesc);
+		assert(ppTexture);
+		Texture* pTexture = new Texture;
+		D3D12_RESOURCE_DESC resourceDesc{ D3D12_RESOURCE_DIMENSION_TEXTURE2D, 0, pDesc->mWidth, pDesc->mHeight, 1, pDesc->mMipLevels, pDesc->mFormat,{ 1, 0 }, D3D12_TEXTURE_LAYOUT_UNKNOWN, pDesc->mFlags };
+		D3D12MA::ALLOCATION_DESC allocDesc = {};
+		allocDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+		ID3D12Resource* resource;
+		pDevice->pResourceAllocator->CreateResource(
+			&allocDesc, &resourceDesc,
+			pDesc->mState, NULL,
+			&pTexture->pAllocation, IID_PPV_ARGS(&resource));
+		resource->Release();
+		*ppTexture = pTexture;
+	}
+
+	void RemoveTexture(Texture* pTexture) {
+		assert(pTexture);
+		pTexture->pAllocation->Release();
+		delete pTexture;
 	}
 }
