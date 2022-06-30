@@ -207,6 +207,11 @@ namespace Rainbow {
 		delete pSwapChain;
 	}
 
+	Cmd* GetSwapChainActiveList(SwapChain* pSwapChain) {
+		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+		return pSwapChain->cmd[frameIndex];
+	}
+
 	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format) {
 		assert(pSwapChain);
 

@@ -111,7 +111,7 @@ namespace Rainbow {
 	void RemoveSwapChain(SwapChain* pSwapChain);
 	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
 	void GetSwapChainBuffer(SwapChain* pSwapChain, uint32_t index, ID3D12Resource** ppRes);
-
+	Cmd* GetSwapChainActiveList(SwapChain* pSwapChain);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSwapChainRTV(SwapChain* pSwapChain);
 	void SwapChainPresent(SwapChain* pSwapChain);
 	
