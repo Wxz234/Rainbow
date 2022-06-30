@@ -386,5 +386,4 @@ namespace Rainbow {
 		QueueExecute(pDevice->pQueue, pSwapChain->cmd[frameIndex]);
 		_res->Release();
 	}
-
 }
