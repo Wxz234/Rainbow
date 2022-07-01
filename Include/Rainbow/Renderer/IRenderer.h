@@ -133,4 +133,6 @@ namespace Rainbow {
 
 	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture);
 	void RemoveTexture(Texture* pTexture);
+
+	void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture);
 }

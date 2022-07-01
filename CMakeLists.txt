@@ -13,6 +13,7 @@ add_library(DirectXTex STATIC
 	ThirdParty/DirectXTex/WICTextureLoader/WICTextureLoader12.cpp
 )
 set_property(TARGET DirectXTex PROPERTY FOLDER "ThirdParty")
+target_include_directories(DirectXTex PRIVATE "ThirdParty/d3dx12/")
 
 add_library(imgui STATIC 
 	ThirdParty/imgui/backends/imgui_impl_win32.cpp

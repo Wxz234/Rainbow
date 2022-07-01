@@ -10,16 +10,18 @@
 #include "../ThirdParty/D3D12MemoryAllocator/include/D3D12MemAlloc.h"
 #include "../ThirdParty/DirectXTex/DDSTextureLoader/DDSTextureLoader12.h"
 #include "../ThirdParty/DirectXTex/WICTextureLoader/WICTextureLoader12.h"
+#include "../ThirdParty/d3dx12/d3dx12.h"
 
 #include <d3d12sdklayers.h>
 #include <winerror.h>
 #include <combaseapi.h>
 #include <synchapi.h>
+#include <sal.h>
 #include <cassert>
-#include <string>
 #include <filesystem>
+#include <memory>
 
-#pragma warning (disable: 4838 6011)
+#pragma warning (disable: 4838 6011 6031 6387)
 
 namespace Rainbow {
 	void CreateDevice(Device** ppDevice) {
@@ -402,5 +404,64 @@ namespace Rainbow {
 		assert(pTexture);
 		pTexture->pAllocation->Release();
 		delete pTexture;
+	}
+
+	void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture) {
+		assert(pDevice);
+		assert(file);
+		assert(ppTexture);
+		Texture* pTexture = new Texture;
+		std::filesystem::path my_path{ file };	
+		ID3D12Resource* _tex;
+		std::unique_ptr<uint8_t[]> picData;
+		D3D12_SUBRESOURCE_DATA subresources;
+		DirectX::LoadWICTextureFromFile(pDevice->pDxDevice, my_path.wstring().c_str(), &_tex, picData, subresources);
+		const UINT64 uploadBufferSize = GetRequiredIntermediateSize(_tex, 0, 1);
+		D3D12_HEAP_PROPERTIES heapProp{};
+		heapProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+		heapProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		heapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		heapProp.CreationNodeMask = 1;
+		heapProp.VisibleNodeMask = 1;
+		D3D12_RESOURCE_DESC resDesc {};
+		resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		resDesc.Alignment = 0;
+		resDesc.Width = uploadBufferSize;
+		resDesc.Height = 1;
+		resDesc.DepthOrArraySize = 1;
+		resDesc.MipLevels = 1;
+		resDesc.Format = DXGI_FORMAT_UNKNOWN;
+		resDesc.SampleDesc.Count = 1;
+		resDesc.SampleDesc.Quality = 0;
+		resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		resDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		ID3D12Resource* uploadRes = nullptr;
+		pDevice->pDxDevice->CreateCommittedResource(
+			&heapProp,
+			D3D12_HEAP_FLAG_NONE,
+			&resDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&uploadRes));
+
+		auto _resDesc = _tex->GetDesc();
+
+		D3D12MA::ALLOCATION_DESC allocDesc = {};
+		allocDesc.HeapType = D3D12_HEAP_TYPE_DEFAULT;
+		ID3D12Resource* resource;
+		pDevice->pResourceAllocator->CreateResource(
+			&allocDesc, &_resDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST, NULL,
+			&pTexture->pAllocation, IID_PPV_ARGS(&resource));
+		CmdReset(pDevice->pCmd);
+		UpdateSubresources(pDevice->pCmd->pDxCmdList, pTexture->pAllocation->GetResource(), uploadRes, 0, 0, 1, &subresources);
+		CmdResourceBarrier(pDevice->pCmd, pTexture->pAllocation->GetResource(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COMMON);
+		QueueExecute(pDevice->pQueue, pDevice->pCmd);
+		QueueWait(pDevice->pQueue);
+		resource->Release();
+		_tex->Release();
+		uploadRes->Release();
+		*ppTexture = pTexture;
 	}
 }
