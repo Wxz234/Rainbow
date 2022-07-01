@@ -7,8 +7,11 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace Rainbow {
 	struct GameObject {
-
+		virtual ~GameObject() {}
+		virtual uint32_t GetID() const = 0;
 	};
 }

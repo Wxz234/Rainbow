@@ -11,10 +11,15 @@
 
 #include "GameObject.h"
 
+#include <vector>
+
 namespace Rainbow {
 	struct Scene {
 
+		void Draw() {}
+
 		Device* pDevice;
+		std::vector<GameObject*> mGameObj;
 	};
 
 	void CreateScene(Device* pDevice, Scene** ppScene);
