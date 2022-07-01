@@ -126,7 +126,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	switch (message)
 	{
-	case WM_SIZE:
+	case WM_EXITSIZEMOVE:
 		w = LOWORD(lParam);
 		h = HIWORD(lParam);
 		Rainbow::QueueWait(pDevice->pQueue);
