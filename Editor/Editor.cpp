@@ -15,10 +15,9 @@ uint32_t w = 1024, h = 768;
 constexpr uint32_t frameCount = 3;
 Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
-
+Rainbow::Scene* pScene = nullptr;
 
 void Draw() {
-
 	Rainbow::BeginDraw(pDevice, pSwapChain);
 	Rainbow::EndDraw(pDevice, pSwapChain);
 	Rainbow::SwapChainPresent(pSwapChain);
