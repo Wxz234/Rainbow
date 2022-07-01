@@ -38,7 +38,7 @@ set_property(TARGET imgui PROPERTY FOLDER "ThirdParty")
 add_library(RainbowCore STATIC Core/Renderer.cpp Core/GUI.cpp Core/Window.cpp)
 target_compile_definitions(RainbowCore PRIVATE UNICODE _UNICODE)
 
-add_library(RainbowRuntime STATIC Runtime/Runtime.cpp Runtime/Model.cpp Runtime/Scene.cpp)
+add_library(RainbowRuntime STATIC Runtime/Runtime.cpp Runtime/Scene.cpp)
 target_compile_definitions(RainbowRuntime PRIVATE UNICODE _UNICODE)
 
 add_executable(RainbowEditor WIN32 Editor/Editor.cpp)

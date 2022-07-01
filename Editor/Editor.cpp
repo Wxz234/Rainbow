@@ -8,6 +8,7 @@
 #include "../Include/Rainbow/Window/Window.h"
 #include "../Include/Rainbow/Renderer/IRenderer.h"
 #include "../Include/Rainbow/GUI/GUI.h"
+#include "../Include/Rainbow/Runtime/Scene.h"
 
 #include "../ThirdParty/imgui/imgui.h"
 
@@ -121,7 +122,6 @@ void Draw() {
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-
 	if (Rainbow::GUIWndProcHandler(hWnd, message, wParam, lParam)) {
 		return true;
 	}
