@@ -151,15 +151,15 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::CreateGUI(pDevice, pSwapChain,&pGui);
 	LoadImguiConfig();
 
-	Rainbow::Texture* pTex;
-	Rainbow::CreateTextureFromFile(pDevice, "C:\\Users\\42937\\Documents\\GitHub\\Rainbow\\Asset\\CornellBox.png", &pTex);
+	//Rainbow::Texture* pTex;
+	//Rainbow::CreateTextureFromFile(pDevice, "C:\\Users\\42937\\Documents\\GitHub\\Rainbow\\Asset\\CornellBox.png", &pTex);
 	//D3D12_DESCRIPTOR_HEAP_DESC heapDesc{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, 0 };
 	//pDevice->pDxDevice->CreateDescriptorHeap(&heapDesc,IID_PPV_ARGS())
 
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
 
-	Rainbow::RemoveTexture(pTex);
+	//Rainbow::RemoveTexture(pTex);
 	Rainbow::RemoveGUI(pGui);
 	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveDevice(pDevice);
