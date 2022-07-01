@@ -121,16 +121,20 @@ void Draw() {
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+
 	if (Rainbow::GUIWndProcHandler(hWnd, message, wParam, lParam)) {
 		return true;
 	}
 	switch (message)
 	{
-	case WM_EXITSIZEMOVE:
-		w = LOWORD(lParam);
-		h = HIWORD(lParam);
-		Rainbow::QueueWait(pDevice->pQueue);
-		Rainbow::SwapChainResize(pSwapChain, w, h, DXGI_FORMAT_UNKNOWN);
+	case WM_SIZE:
+		if (SIZE_MINIMIZED != wParam) {
+			w = LOWORD(lParam);
+			h = HIWORD(lParam);
+
+			Rainbow::QueueWait(pDevice->pQueue);
+			Rainbow::SwapChainResize(pSwapChain, w, h, DXGI_FORMAT_UNKNOWN);
+		}
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
