@@ -457,6 +457,7 @@ namespace Rainbow {
 		CmdReset(pDevice->pCmd);
 		UpdateSubresources(pDevice->pCmd->pDxCmdList, pTexture->pAllocation->GetResource(), uploadRes, 0, 0, 1, &subresources);
 		CmdResourceBarrier(pDevice->pCmd, pTexture->pAllocation->GetResource(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COMMON);
+		CmdClose(pDevice->pCmd);
 		QueueExecute(pDevice->pQueue, pDevice->pCmd);
 		QueueWait(pDevice->pQueue);
 		resource->Release();

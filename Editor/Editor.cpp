@@ -25,7 +25,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
-	case WM_SIZE:
+	case WM_EXITSIZEMOVE:
 		w = LOWORD(lParam);
 		h = HIWORD(lParam);
 		Rainbow::QueueWait(pDevice->pQueue);
@@ -54,6 +54,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
 
+	Rainbow::RemoveTexture(pTex);
 	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveDevice(pDevice);
 	Rainbow::RemoveRenderWindow(pWindow);
