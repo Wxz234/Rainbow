@@ -9,6 +9,8 @@
 
 #include "../Renderer/IRenderer.h"
 
+#include "GameObject.h"
+
 namespace Rainbow {
 	struct Scene {
 
