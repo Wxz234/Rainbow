@@ -7,8 +7,11 @@
 
 #pragma once
 
+#include "../Renderer/IRenderer.h"
+
 namespace Rainbow {
 	struct Scene {
 
+		Device* pDevice;
 	};
 }
