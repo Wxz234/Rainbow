@@ -31,10 +31,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (SIZE_MINIMIZED != wParam) {
 			w = LOWORD(lParam);
 			h = HIWORD(lParam);
-			if (h != 0) {
-				Rainbow::QueueWait(pDevice->pQueue);
-				Rainbow::SwapChainResize(pSwapChain, w, h, DXGI_FORMAT_UNKNOWN);
-			}
+			Rainbow::QueueWait(pDevice->pQueue);
+			Rainbow::SwapChainResize(pSwapChain, w, h, DXGI_FORMAT_UNKNOWN);
+		}
+		break;
+
+	case WM_GETMINMAXINFO:
+		if (lParam)
+		{
+			auto info = reinterpret_cast<MINMAXINFO*>(lParam);
+			info->ptMinTrackSize.x = 320;
+			info->ptMinTrackSize.y = 200;
 		}
 		break;
 	case WM_DESTROY:
