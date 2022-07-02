@@ -17,9 +17,11 @@
 #include <combaseapi.h>
 #include <synchapi.h>
 #include <sal.h>
+#include <d3dcompiler.h>
 #include <cassert>
 #include <filesystem>
 #include <memory>
+#include <string>
 
 #pragma warning (disable: 4838 6011 6031 6387)
 
@@ -464,5 +466,34 @@ namespace Rainbow {
 		_tex->Release();
 		uploadRes->Release();
 		*ppTexture = pTexture;
+	}
+
+	void CreateShaderFromFile(const char* file, ShaderDesc* pDesc, Shader** ppShader) {
+		assert(file);
+		assert(pDesc);
+		assert(ppShader);
+		Shader* pShader = new Shader;
+		if (pDesc->mShaderModel == SHADER_MODEL_5_1) {
+			std::filesystem::path my_path{ file };
+			std::vector<D3D_SHADER_MACRO> macro;
+			for (uint32_t i = 0;i < pDesc->mMacroCount; ++i) {
+				macro.emplace_back(D3D_SHADER_MACRO{ pDesc->pMacros[i].definition, pDesc->pMacros[i].value });
+			}
+			macro.emplace_back(D3D_SHADER_MACRO{ NULL, NULL });
+			std::string target;
+			if (pDesc->mShaderType == SHADER_TYPE_VERTEX) {
+				target += "vs_5_1";
+			}
+			else {
+				target += "ps_5_1";
+			}
+			D3DCompileFromFile(my_path.wstring().c_str(), macro.data(), D3D_COMPILE_STANDARD_FILE_INCLUDE, pDesc->pEntryPoint, target.c_str(), 0, 0, &pShader->pBlob, nullptr);
+		}
+		*ppShader = pShader;
+	}
+
+	void RemoveShader(Shader* pShader) {
+		assert(pShader);
+		delete pShader;
 	}
 }

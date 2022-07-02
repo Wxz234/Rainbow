@@ -11,6 +11,7 @@
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
+#include <d3dcommon.h>
 #include <cstdint>
 #include <handleapi.h>
 #include <vector>
@@ -133,6 +134,35 @@ namespace Rainbow {
 
 	void CreateTexture(Device* pDevice, TextureDesc* pDesc, Texture** ppTexture);
 	void RemoveTexture(Texture* pTexture);
-
 	void CreateTextureFromFile(Device* pDevice, const char* file, Texture** ppTexture);
+
+	enum ShaderType {
+		SHADER_TYPE_VERTEX = 0,
+		SHADER_TYPE_PIXEL,
+	};
+
+	enum ShaderModel {
+		SHADER_MODEL_5_1 = 0
+	};
+
+	struct ShaderMacro
+	{
+		const char* definition;
+		const char* value;
+	};
+
+	struct Shader {
+		ID3DBlob* pBlob;
+	};
+
+	struct ShaderDesc {
+		ShaderType mShaderType;
+		ShaderModel mShaderModel;
+		ShaderMacro* pMacros;
+		uint32_t     mMacroCount;
+		const char* pEntryPoint;
+	};
+
+	void CreateShaderFromFile(const char* file, ShaderDesc* pDesc, Shader** ppShader);
+	void RemoveShader(Shader* pShader);
 }
