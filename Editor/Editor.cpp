@@ -10,6 +10,12 @@
 
 #include <Windows.h>
 
+uint32_t w = 1024, h = 768;
+constexpr uint32_t frameCount = 3;
+Rainbow::Window* pWindow = nullptr;
+Rainbow::Device* pDevice = nullptr;
+//Rainbow::SwapChain* pSwapChain = nullptr;
+
 void Draw() {
 }
 
@@ -41,5 +47,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd)
 {
+	Rainbow::CreateRenderWindow("RainbowEditor", w, h, WndProc, &pWindow);
+	Rainbow::CreateDevice(&pDevice);
+	//Rainbow::SwapChainDesc swapchainDesc{ pWindow->mWindowHandle, frameCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM };
+
+	Rainbow::RemoveDevice(pDevice);
+	Rainbow::RemoveRenderWindow(pWindow);
 	return 0;
 }
