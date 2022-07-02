@@ -258,6 +258,22 @@ namespace Rainbow {
 		temp_swapchain->QueryInterface(&pSwapChain->pDxSwapChain);
 		temp_factory->MakeWindowAssociation((HWND)pDesc->mWindowHandle.window, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
 		
+		D3D12_DESCRIPTOR_HEAP_DESC heapdesc = {};
+		heapdesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+		heapdesc.NumDescriptors = pDesc->mImageCount;
+		heapdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		pDevice->pDxDevice->CreateDescriptorHeap(&heapdesc, IID_PPV_ARGS(&pSwapChain->pDxRTVHeap));
+
+		pSwapChain->mDescriptorSize = pDevice->pDxDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = pSwapChain->pDxRTVHeap->GetCPUDescriptorHandleForHeapStart();
+		for (uint32_t i = 0; i < pDesc->mImageCount; i++)
+		{
+			Microsoft::WRL::ComPtr<ID3D12Resource> pBackBuffer;
+			pSwapChain->pDxSwapChain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
+			pDevice->pDxDevice->CreateRenderTargetView(pBackBuffer.Get(), NULL, rtvHandle);
+			rtvHandle.ptr += pSwapChain->mDescriptorSize;
+		}
+
 		pSwapChain->mImageCount = pDesc->mImageCount;
 	
 		auto temp_array = new Cmd * [pSwapChain->mImageCount]{};
@@ -269,6 +285,7 @@ namespace Rainbow {
 
 		pSwapChain->pDeviceRef = pDevice;
 		_Save(pSwapChain->pDeviceRef, pSwapChain->pDxSwapChain);
+		_Save(pSwapChain->pDeviceRef, pSwapChain->pDxRTVHeap);
 
 		*ppSwapChain = pSwapChain;
 	}
@@ -282,7 +299,9 @@ namespace Rainbow {
 
 		if (force) {
 			_Erase(pSwapChain->pDeviceRef, pSwapChain->pDxSwapChain);
+			_Erase(pSwapChain->pDeviceRef, pSwapChain->pDxRTVHeap);
 		}
+		pSwapChain->pDxRTVHeap->Release();
 		pSwapChain->pDxSwapChain->Release();
 		delete[]pSwapChain->pCmdArray;
 		delete pSwapChain;

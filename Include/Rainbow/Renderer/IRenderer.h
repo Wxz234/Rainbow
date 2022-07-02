@@ -69,8 +69,10 @@ namespace Rainbow {
 
 	struct SwapChain {
 		IDXGISwapChain4* pDxSwapChain;
+		ID3D12DescriptorHeap* pDxRTVHeap;
 
 		uint32_t mImageCount;
+		uint32_t mDescriptorSize;
 
 		Cmd** pCmdArray;
 		void* pDeviceRef;
