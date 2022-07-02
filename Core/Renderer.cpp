@@ -13,12 +13,7 @@
 #include <winerror.h>
 #include <combaseapi.h>
 #include <synchapi.h>
-#include <sal.h>
-#include <d3dcompiler.h>
 #include <cassert>
-#include <filesystem>
-#include <memory>
-#include <string>
 
 #pragma warning (disable: 4838 6011 6031 6387)
 
