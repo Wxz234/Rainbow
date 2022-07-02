@@ -88,7 +88,7 @@ namespace Rainbow {
 
 	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
 	void RemoveSwapChain(SwapChain* pSwapChain, bool force = false);
-
+	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
 	void BeginDraw(SwapChain* pSwapChain);
 	void EndDraw(SwapChain* pSwapChain);
 }

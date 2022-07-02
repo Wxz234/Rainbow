@@ -308,6 +308,25 @@ namespace Rainbow {
 		delete pSwapChain;
 	}
 
+	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format) {
+		assert(pSwapChain);
+		DXGI_SWAP_CHAIN_DESC scDesc{};
+		pSwapChain->pDxSwapChain->GetDesc(&scDesc);
+		pSwapChain->pDxSwapChain->ResizeBuffers(scDesc.BufferCount, width, height, format, 0);
+
+		Microsoft::WRL::ComPtr<ID3D12Device> temp_device;
+		pSwapChain->pDxRTVHeap->GetDevice(IID_PPV_ARGS(&temp_device));
+
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = pSwapChain->pDxRTVHeap->GetCPUDescriptorHandleForHeapStart();
+		for (uint32_t i = 0; i < scDesc.BufferCount; ++i)
+		{
+			Microsoft::WRL::ComPtr<ID3D12Resource> pBackBuffer;
+			pSwapChain->pDxSwapChain->GetBuffer(i, IID_PPV_ARGS(&pBackBuffer));
+			temp_device->CreateRenderTargetView(pBackBuffer.Get(), NULL, rtvHandle);
+			rtvHandle.ptr += pSwapChain->mDescriptorSize;
+		}
+	}
+
 	void BeginDraw(SwapChain* pSwapChain) {
 		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
 		CmdReset(pSwapChain->pCmdArray[frameIndex]);
