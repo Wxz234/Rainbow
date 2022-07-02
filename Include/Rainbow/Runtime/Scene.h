@@ -10,9 +10,12 @@
 #include "../Renderer/IRenderer.h"
 #include "GameObject.h"
 
+#include <vector>
+
 namespace Rainbow {
 	struct Scene {
 		Device* pDevice;
+		std::vector<GameObject*> mGameObject;
 	};
 
 	void CreateScene(Device *pDevice, Scene**ppScene);
