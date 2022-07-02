@@ -7,6 +7,7 @@
 
 #include "../Include/Rainbow/Window/Window.h"
 #include "../Include/Rainbow/Renderer/IRenderer.h"
+#include "../Include/Rainbow/Runtime/Scene.h"
 
 #include <Windows.h>
 
