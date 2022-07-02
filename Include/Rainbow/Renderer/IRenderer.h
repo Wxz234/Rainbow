@@ -72,7 +72,7 @@ namespace Rainbow {
 
 		uint32_t mImageCount;
 
-		Cmd* pCmdArray;
+		Cmd** pCmdArray;
 		void* pDeviceRef;
 	};
 

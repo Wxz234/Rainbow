@@ -127,15 +127,12 @@ namespace Rainbow {
 
 	void RemoveDevice(Device* pDevice) {
 		assert(pDevice);
-		RemoveQueue(pDevice->pQueue,true);
-		RemoveCmd(pDevice->pCmd, true);
+		RemoveQueue(pDevice->pQueue, true);
+		RemoveCmd(pDevice->pCmd, false);
 
 		for (auto& ptr : pDevice->mAllInterface) {
-			auto refCount = ptr->AddRef();
-			assert(refCount == 2);
-
-			ptr->Release();
-			ptr->Release();
+			auto refCount = ptr->Release();
+			assert(refCount == 0);
 		}
 
 		pDevice->pResourceAllocator->Release();
@@ -262,6 +259,13 @@ namespace Rainbow {
 		temp_factory->MakeWindowAssociation((HWND)pDesc->mWindowHandle.window, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
 		
 		pSwapChain->mImageCount = pDesc->mImageCount;
+	
+		auto temp_array = new Cmd * [pSwapChain->mImageCount]{};
+
+		pSwapChain->pCmdArray = temp_array;
+		for (uint32_t i = 0; i < pDesc->mImageCount; ++i) {
+			CreateCmd(pDevice, COMMAND_TYPE_GRAPHICS, temp_array++);
+		}
 
 		pSwapChain->pDeviceRef = pDevice;
 		_Save(pSwapChain->pDeviceRef, pSwapChain->pDxSwapChain);
@@ -270,11 +274,17 @@ namespace Rainbow {
 	}
 	void RemoveSwapChain(SwapChain* pSwapChain, bool force) {
 		assert(pSwapChain);
+		auto temp_array = pSwapChain->pCmdArray;
+
+		for (uint32_t i = 0; i < pSwapChain->mImageCount; ++i) {
+			RemoveCmd(*temp_array++, false);
+		}
+
 		if (force) {
 			_Erase(pSwapChain->pDeviceRef, pSwapChain->pDxSwapChain);
 		}
 		pSwapChain->pDxSwapChain->Release();
-
+		delete[]pSwapChain->pCmdArray;
 		delete pSwapChain;
 	}
 

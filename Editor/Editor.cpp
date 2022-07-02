@@ -17,6 +17,7 @@ Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
 
 void Draw() {
+	pSwapChain->pDxSwapChain->Present(1, 0);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
