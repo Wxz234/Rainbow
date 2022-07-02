@@ -69,6 +69,8 @@ namespace Rainbow {
 
 	struct SwapChain {
 		IDXGISwapChain4* pDxSwapChain;
+
+		void* pDeviceRef;
 	};
 
 	struct SwapChainDesc {
@@ -80,5 +82,5 @@ namespace Rainbow {
 	};
 
 	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
-	void RemoveSwapChain(SwapChain* pSwapChain);
+	void RemoveSwapChain(SwapChain* pSwapChain, bool force = false);
 }

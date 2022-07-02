@@ -38,6 +38,14 @@ namespace Rainbow {
 			}
 		);
 	}
+	template <typename T>
+	void _Save(void* device,T *p) {
+		IUnknown* _save = nullptr;
+		p->QueryInterface(&_save);
+		auto pDevice = (Device*)device;
+		pDevice->mAllInterface.push_back(_save);
+	}
+
 
 	void CmdReset(Cmd* pCmd) {
 		assert(pCmd);
@@ -119,12 +127,13 @@ namespace Rainbow {
 
 	void RemoveDevice(Device* pDevice) {
 		assert(pDevice);
-		RemoveQueue(pDevice->pQueue);
-		RemoveCmd(pDevice->pCmd);
+		RemoveQueue(pDevice->pQueue,true);
+		RemoveCmd(pDevice->pCmd, true);
 
 		for (auto& ptr : pDevice->mAllInterface) {
 			auto refCount = ptr->AddRef();
 			assert(refCount == 2);
+
 			ptr->Release();
 			ptr->Release();
 		}
@@ -154,12 +163,8 @@ namespace Rainbow {
 		pDevice->pDxDevice->CreateCommandList1(0, listDesc, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&pCmd->pDxCmdList));
 		pCmd->pDeviceRef = pDevice;
 
-		IUnknown* _save_list = nullptr;
-		IUnknown* _save_alloc = nullptr;
-		pCmd->pDxCmdList->QueryInterface(&_save_list);
-		pCmd->pDxCmdAlloc->QueryInterface(&_save_alloc);
-		pDevice->mAllInterface.push_back(_save_list);
-		pDevice->mAllInterface.push_back(_save_alloc);
+		_Save(pCmd->pDeviceRef, pCmd->pDxCmdList);
+		_Save(pCmd->pDeviceRef, pCmd->pDxCmdAlloc);
 		*ppCmd = pCmd;
 	}
 	void RemoveCmd(Cmd* pCmd, bool force) {
@@ -196,6 +201,10 @@ namespace Rainbow {
 		pQueue->pDxWaitIdleFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 		pQueue->mFenceValue = 1;
 		pQueue->pDeviceRef = pDevice;
+
+		_Save(pQueue->pDeviceRef, pQueue->pDxQueue);
+		_Save(pQueue->pDeviceRef, pQueue->pDxFence);
+
 		*ppQueue = pQueue;
 	}
 	void RemoveQueue(Queue* pQueue, bool force) {
@@ -248,11 +257,22 @@ namespace Rainbow {
 		CreateDXGIFactory2(0, IID_PPV_ARGS(&temp_factory));
 #endif //_DEBUG
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> temp_swapchain;
-		//temp_factory->CreateSwapChainForHwnd(pDevice->pQueue->pDxQueue, (HWND)pDesc->mWindowHandle.window, &_desc, &fsSwapChainDesc, nullptr, &temp_swapchain);
-		//temp_swapchain->QueryInterface(&pSwapChain->pDxSwapChain);
-		//temp_factory->MakeWindowAssociation((HWND)pDesc->mWindowHandle.window, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
-	}
-	void RemoveSwapChain(SwapChain* pSwapChain) {
+		temp_factory->CreateSwapChainForHwnd(pDevice->pQueue->pDxQueue, (HWND)pDesc->mWindowHandle.window, &_desc, &fsSwapChainDesc, nullptr, &temp_swapchain);
+		temp_swapchain->QueryInterface(&pSwapChain->pDxSwapChain);
+		temp_factory->MakeWindowAssociation((HWND)pDesc->mWindowHandle.window, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
+		pSwapChain->pDeviceRef = pDevice;
 
+		_Save(pSwapChain->pDeviceRef, pSwapChain->pDxSwapChain);
+
+		*ppSwapChain = pSwapChain;
+	}
+	void RemoveSwapChain(SwapChain* pSwapChain, bool force) {
+		assert(pSwapChain);
+		if (force) {
+			_Erase(pSwapChain->pDeviceRef, pSwapChain->pDxSwapChain);
+		}
+		pSwapChain->pDxSwapChain->Release();
+
+		delete pSwapChain;
 	}
 }
