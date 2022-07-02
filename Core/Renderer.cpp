@@ -359,8 +359,7 @@ namespace Rainbow {
 
 	void BeginDraw(Device* pDevice, SwapChain* pSwapChain) {
 		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
-		pSwapChain->cmd[frameIndex]->pDxCmdAlloc->Reset();
-		pSwapChain->cmd[frameIndex]->pDxCmdList->Reset(pSwapChain->cmd[frameIndex]->pDxCmdAlloc, nullptr);
+		CmdReset(pSwapChain->cmd[frameIndex]);
 		ID3D12Resource* _res = nullptr;
 		pSwapChain->pDxSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&_res));
 		CmdResourceBarrier(pSwapChain->cmd[frameIndex], _res, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -373,6 +372,7 @@ namespace Rainbow {
 		pSwapChain->pDxSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&_res));
 		CmdResourceBarrier(pSwapChain->cmd[frameIndex], _res, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		pSwapChain->cmd[frameIndex]->pDxCmdList->Close();
+		CmdClose(pSwapChain->cmd[frameIndex]);
 		QueueExecute(pDevice->pQueue, pSwapChain->cmd[frameIndex]);
 		SwapChainPresent(pSwapChain);
 		_res->Release();
