@@ -382,6 +382,7 @@ namespace Rainbow {
 		CmdResourceBarrier(pSwapChain->cmd[frameIndex], _res, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 		pSwapChain->cmd[frameIndex]->pDxCmdList->Close();
 		QueueExecute(pDevice->pQueue, pSwapChain->cmd[frameIndex]);
+		SwapChainPresent(pSwapChain);
 		_res->Release();
 	}
 

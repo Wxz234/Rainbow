@@ -20,7 +20,6 @@ Rainbow::Scene* pScene = nullptr;
 void Draw() {
 	Rainbow::BeginDraw(pDevice, pSwapChain);
 	Rainbow::EndDraw(pDevice, pSwapChain);
-	Rainbow::SwapChainPresent(pSwapChain);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
