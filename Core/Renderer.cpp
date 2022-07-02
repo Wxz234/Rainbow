@@ -15,6 +15,7 @@
 #include <synchapi.h>
 #include <WinBase.h>
 #include <cassert>
+#include <vector>
 
 #pragma warning(disable : 6031)
 
@@ -308,9 +309,35 @@ namespace Rainbow {
 	}
 
 	void BeginDraw(SwapChain* pSwapChain) {
-
+		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+		CmdReset(pSwapChain->pCmdArray[frameIndex]);
+		Microsoft::WRL::ComPtr<ID3D12Resource> _res;
+		pSwapChain->pDxSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&_res));
+		CmdResourceBarrier(pSwapChain->pCmdArray[frameIndex], _res.Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 	void EndDraw(SwapChain* pSwapChain) {
+		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+		Microsoft::WRL::ComPtr<ID3D12Resource> _res;
+		pSwapChain->pDxSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&_res));
+		CmdResourceBarrier(pSwapChain->pCmdArray[frameIndex], _res.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		CmdClose(pSwapChain->pCmdArray[frameIndex]);
+		auto pDevice = (Device*)pSwapChain->pDeviceRef;
+		QueueExecute(pDevice->pQueue, pSwapChain->pCmdArray[frameIndex]);
 
+		static std::vector<uint64_t> fenceValue(pSwapChain->mImageCount, 0);
+		fenceValue[frameIndex] = pDevice->pQueue->mFenceValue++;
+
+		pSwapChain->pDxSwapChain->Present(1, 0);
+
+		const uint64_t currentFenceValue = fenceValue[frameIndex];
+		pDevice->pQueue->pDxQueue->Signal(pDevice->pQueue->pDxFence, currentFenceValue);
+
+		frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
+
+		if (pDevice->pQueue->pDxFence->GetCompletedValue() < fenceValue[frameIndex])
+		{
+			pDevice->pQueue->pDxFence->SetEventOnCompletion(fenceValue[frameIndex], pDevice->pQueue->pDxWaitIdleFenceEvent);
+			WaitForSingleObjectEx(pDevice->pQueue->pDxWaitIdleFenceEvent, INFINITE, FALSE);
+		}
 	}
 }
