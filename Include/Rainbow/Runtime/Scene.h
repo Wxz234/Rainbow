@@ -16,6 +16,6 @@ namespace Rainbow {
 		Impl* pimpl;
 	};
 
-	void CreateScene(Device* pDevice, Scene** ppScene);
-	void RemoveScene(Scene* pScene);
+	//void CreateScene(Device* pDevice, Scene** ppScene);
+	//void RemoveScene(Scene* pScene);
 }
