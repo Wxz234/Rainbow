@@ -14,6 +14,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <vector>
+#include <cstdint>
 
 namespace Rainbow {
 	enum CommandType
@@ -39,7 +40,12 @@ namespace Rainbow {
 		ID3D12Fence* pDxFence;
 		HANDLE pDxWaitIdleFenceEvent;
 		uint64_t mFenceValue;
+
+		void* pDeviceRef;
 	};
+
+	void QueueExecute(Queue* pQueue, Cmd* pCmd);
+	void QueueWait(Queue* pQueue);
 
 	struct Device {
 		IDXGIAdapter4* pDxActiveGPU;
@@ -47,6 +53,7 @@ namespace Rainbow {
 		D3D12MA::Allocator* pResourceAllocator;
 
 		Cmd* pCmd;
+		Queue* pQueue;
 
 		std::vector<IUnknown*> mAllInterface;
 	};

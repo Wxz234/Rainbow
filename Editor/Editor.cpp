@@ -48,11 +48,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 {
 	Rainbow::CreateRenderWindow("RainbowEditor", w, h, WndProc, &pWindow);
 	Rainbow::CreateDevice(&pDevice);
-	Rainbow::Cmd* pCmd;
-	Rainbow::CreateCmd(pDevice, Rainbow::COMMAND_TYPE_GRAPHICS, &pCmd);
-	//Rainbow::SwapChainDesc swapchainDesc{ pWindow->mWindowHandle, frameCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM };
-
-	Rainbow::RemoveCmd(pCmd);
 
 	Rainbow::RemoveDevice(pDevice);
 	Rainbow::RemoveRenderWindow(pWindow);

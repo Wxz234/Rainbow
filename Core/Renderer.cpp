@@ -12,11 +12,32 @@
 #include <wrl/client.h>
 #include <winerror.h>
 #include <objbase.h>
+#include <synchapi.h>
+#include <WinBase.h>
 #include <cassert>
 
 #pragma warning(disable : 6031)
 
 namespace Rainbow {
+
+	template <typename T>
+	void _Erase(void* device, T* p) {
+		auto pDevice = (Device*)device;
+		std::erase_if(pDevice->mAllInterface,
+			[&](IUnknown* ptr)
+			{
+				IUnknown* temp;
+				p->QueryInterface(&temp);
+				if (ptr == temp) {
+					ptr->Release();
+					temp->Release();
+					return true;
+				}
+				temp->Release();
+				return false;
+			}
+		);
+	}
 
 	void CmdReset(Cmd* pCmd) {
 		assert(pCmd);
@@ -49,6 +70,21 @@ namespace Rainbow {
 		pCmd->pDxCmdList->ResourceBarrier(1, &barrier);
 	}
 
+	void QueueExecute(Queue* pQueue, Cmd* pCmd) {
+		assert(pQueue);
+		assert(pCmd);
+		pQueue->pDxQueue->ExecuteCommandLists(1, (ID3D12CommandList* const*)&pCmd->pDxCmdList);
+	}
+	void QueueWait(Queue* pQueue) {
+		const uint64_t fence = pQueue->mFenceValue++;
+		pQueue->pDxQueue->Signal(pQueue->pDxFence, fence);
+		if (pQueue->pDxFence->GetCompletedValue() < fence)
+		{
+			pQueue->pDxFence->SetEventOnCompletion(fence, pQueue->pDxWaitIdleFenceEvent);
+			WaitForSingleObject(pQueue->pDxWaitIdleFenceEvent, INFINITE);
+		}
+	}
+
 	void CreateDevice(Device** ppDevice) {
 		assert(ppDevice);
 
@@ -75,6 +111,7 @@ namespace Rainbow {
 		allocdesc.pAdapter = pDevice->pDxActiveGPU;
 		D3D12MA::CreateAllocator(&allocdesc, &pDevice->pResourceAllocator);
 
+		CreateQueue(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pQueue);
 		CreateCmd(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pCmd);
 
 		*ppDevice = pDevice;
@@ -82,7 +119,7 @@ namespace Rainbow {
 
 	void RemoveDevice(Device* pDevice) {
 		assert(pDevice);
-
+		RemoveQueue(pDevice->pQueue);
 		RemoveCmd(pDevice->pCmd);
 
 		for (auto& ptr : pDevice->mAllInterface) {
@@ -127,43 +164,60 @@ namespace Rainbow {
 	}
 	void RemoveCmd(Cmd* pCmd, bool force) {
 		assert(pCmd);
-		auto pDevice = (Device*)pCmd->pDeviceRef;
 
 		if (force) {
-			std::erase_if(pDevice->mAllInterface,
-				[&](IUnknown* ptr) 
-				{ 
-					IUnknown* alloc;
-					pCmd->pDxCmdAlloc->QueryInterface(&alloc);
-					if (ptr == alloc) {
-						ptr->Release(); 
-						alloc->Release();
-						return true; 
-					}
-					alloc->Release();
-					return false;
-				}
-			);
-			std::erase_if(pDevice->mAllInterface,
-				[&](IUnknown* ptr)
-				{
-					IUnknown* list;
-					pCmd->pDxCmdList->QueryInterface(&list);
-					if (ptr == list) {
-						ptr->Release();
-						list->Release();
-						return true;
-					}
-					list->Release();
-					return false;
-				}
-			);
+			_Erase(pCmd->pDeviceRef, pCmd->pDxCmdAlloc);
+			_Erase(pCmd->pDeviceRef, pCmd->pDxCmdList);
 		}
 
 		pCmd->pDxCmdAlloc->Release();
 		pCmd->pDxCmdList->Release();
 
 		delete pCmd;
+	}
+
+	void CreateQueue(Device* pDevice, CommandType mType, Queue** ppQueue) {
+		assert(pDevice);
+		assert(ppQueue);
+		Queue* pQueue = new Queue;
+		D3D12_COMMAND_QUEUE_DESC queueDesc{};
+		if (mType == COMMAND_TYPE_GRAPHICS) {
+			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		}
+		else if (mType == COMMAND_TYPE_COMPUTE) {
+			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+		}
+		else if (mType == COMMAND_TYPE_COPY) {
+			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COPY;
+		}
+
+		pDevice->pDxDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&pQueue->pDxQueue));
+		pDevice->pDxDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pQueue->pDxFence));
+		pQueue->pDxWaitIdleFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		pQueue->mFenceValue = 1;
+		pQueue->pDeviceRef = pDevice;
+		*ppQueue = pQueue;
+	}
+	void RemoveQueue(Queue* pQueue, bool force) {
+		assert(pQueue);
+		const uint64_t fence = pQueue->mFenceValue;
+		pQueue->pDxQueue->Signal(pQueue->pDxFence, fence);
+		if (pQueue->pDxFence->GetCompletedValue() < fence)
+		{
+			pQueue->pDxFence->SetEventOnCompletion(fence, pQueue->pDxWaitIdleFenceEvent);
+			WaitForSingleObject(pQueue->pDxWaitIdleFenceEvent, INFINITE);
+		}
+
+		if (force) {
+			_Erase(pQueue->pDeviceRef, pQueue->pDxFence);
+			_Erase(pQueue->pDeviceRef, pQueue->pDxQueue);
+		}
+
+		pQueue->pDxFence->Release();
+		pQueue->pDxQueue->Release();
+		CloseHandle(pQueue->pDxWaitIdleFenceEvent);
+
+		delete pQueue;
 	}
 
 	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain) {
