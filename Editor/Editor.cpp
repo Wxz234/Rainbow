@@ -61,7 +61,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::SwapChainDesc swapchainDesc{ pWindow->mWindowHandle, frameCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pDevice, &swapchainDesc, &pSwapChain);
 
-	Rainbow::CreateScene(&pScene);
+	Rainbow::CreateScene(pDevice, &pScene);
 
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
