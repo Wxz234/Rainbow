@@ -8,10 +8,13 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 
 namespace Rainbow {
 	struct GameObject {
 		virtual ~GameObject() {}
-		virtual uint32_t GetID() const = 0;
+		virtual uint32_t GetID();
+	protected:
+		std::optional<uint32_t> ID;
 	};
 }

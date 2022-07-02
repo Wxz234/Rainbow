@@ -8,6 +8,7 @@
 #include "../Include/Rainbow/Window/Window.h"
 #include "../Include/Rainbow/Renderer/IRenderer.h"
 #include "../Include/Rainbow/Runtime/Scene.h"
+#include "../Include/Rainbow/Runtime/GameObject.h"
 
 #include <Windows.h>
 
@@ -58,6 +59,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::CreateDevice(&pDevice);
 	Rainbow::SwapChainDesc swapchainDesc{ pWindow->mWindowHandle, frameCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pDevice, &swapchainDesc, &pSwapChain);
+	Rainbow::GameObject G;
+	auto g = G.GetID();
+	Rainbow::GameObject X;
+
+	auto x = X.GetID();
 
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
