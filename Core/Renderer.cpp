@@ -260,8 +260,10 @@ namespace Rainbow {
 		temp_factory->CreateSwapChainForHwnd(pDevice->pQueue->pDxQueue, (HWND)pDesc->mWindowHandle.window, &_desc, &fsSwapChainDesc, nullptr, &temp_swapchain);
 		temp_swapchain->QueryInterface(&pSwapChain->pDxSwapChain);
 		temp_factory->MakeWindowAssociation((HWND)pDesc->mWindowHandle.window, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
-		pSwapChain->pDeviceRef = pDevice;
+		
+		pSwapChain->mImageCount = pDesc->mImageCount;
 
+		pSwapChain->pDeviceRef = pDevice;
 		_Save(pSwapChain->pDeviceRef, pSwapChain->pDxSwapChain);
 
 		*ppSwapChain = pSwapChain;
@@ -274,5 +276,12 @@ namespace Rainbow {
 		pSwapChain->pDxSwapChain->Release();
 
 		delete pSwapChain;
+	}
+
+	void BeginDraw(SwapChain* pSwapChain) {
+
+	}
+	void EndDraw(SwapChain* pSwapChain) {
+
 	}
 }

@@ -70,6 +70,9 @@ namespace Rainbow {
 	struct SwapChain {
 		IDXGISwapChain4* pDxSwapChain;
 
+		uint32_t mImageCount;
+
+		Cmd* pCmdArray;
 		void* pDeviceRef;
 	};
 
@@ -83,4 +86,7 @@ namespace Rainbow {
 
 	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
 	void RemoveSwapChain(SwapChain* pSwapChain, bool force = false);
+
+	void BeginDraw(SwapChain* pSwapChain);
+	void EndDraw(SwapChain* pSwapChain);
 }
