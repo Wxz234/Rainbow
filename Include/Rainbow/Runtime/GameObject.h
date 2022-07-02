@@ -13,7 +13,10 @@
 namespace Rainbow {
 	struct GameObject {
 		virtual ~GameObject() {}
-		virtual uint32_t GetID();
+		uint32_t GetID();
+		virtual bool IsRenderable() {
+			return false;
+		}
 	protected:
 		std::optional<uint32_t> ID;
 	};

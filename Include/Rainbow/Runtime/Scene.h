@@ -14,6 +14,11 @@
 
 namespace Rainbow {
 	struct Scene {
+
+		void AddGameObject(GameObject* pGo) {
+			mGameObject.push_back(pGo);
+		}
+
 		Device* pDevice;
 		std::vector<GameObject*> mGameObject;
 	};
