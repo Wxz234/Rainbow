@@ -10,14 +10,19 @@
 #include <cassert>
 
 namespace Rainbow {
-	void CreateScene(Device* pDevice, Scene** ppScene) {
-		assert(pDevice);
+	class Scene::Impl {
+	public:
+	};
+
+	void CreateScene(Scene** ppScene) {
 		assert(ppScene);
 		Scene* pScene = new Scene;
+		pScene->pimpl = new Scene::Impl;
 		*ppScene = pScene;
 	}
 	void RemoveScene(Scene* pScene) {
 		assert(pScene);
+		delete pScene->pimpl;
 		delete pScene;
 	}
 }

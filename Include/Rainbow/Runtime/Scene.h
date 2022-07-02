@@ -7,21 +7,12 @@
 
 #pragma once
 
-#include "../Renderer/IRenderer.h"
-
-#include "GameObject.h"
-
-#include <vector>
-
 namespace Rainbow {
 	struct Scene {
-
-		void Draw() {}
-
-		Device* pDevice;
-		std::vector<GameObject*> mGameObj;
+		class Impl;
+		Impl* pimpl;
 	};
 
-	void CreateScene(Device* pDevice, Scene** ppScene);
+	void CreateScene(Scene** ppScene);
 	void RemoveScene(Scene* pScene);
 }
