@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "../Renderer/IRenderer.h"
+
 namespace Rainbow {
 	struct Scene {
 		class Impl;

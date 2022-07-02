@@ -12,6 +12,7 @@
 namespace Rainbow {
 	class Scene::Impl {
 	public:
+
 	};
 
 	void CreateScene(Scene** ppScene) {
