@@ -11,7 +11,9 @@
 
 namespace Rainbow {
 	struct Scene {
-		class Impl;
-		Impl* pimpl;
+		Device* pDevice;
 	};
+
+	void CreateScene(Device *pDevice, Scene**ppScene);
+	void RemoveScene(Scene* pScene);
 }
