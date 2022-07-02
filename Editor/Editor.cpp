@@ -64,8 +64,20 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 
 	Rainbow::CreateScene(pDevice, &pScene);
 
+	Rainbow::Shader* pShader = nullptr;
+	Rainbow::ShaderDesc shaderDesc{};
+	shaderDesc.mShaderType = Rainbow::SHADER_TYPE_VERTEX;
+	shaderDesc.mShaderModel = Rainbow::SHADER_MODEL_5_1;
+	shaderDesc.pMacros = nullptr;
+	shaderDesc.mMacroCount = 0;
+	shaderDesc.pEntryPoint = "main";
+
+	Rainbow::CreateShaderFromFile("C:\\Users\\42937\\Documents\\GitHub\\Rainbow3D\\Project1\\Project1\\VertexShader.hlsl", &shaderDesc, &pShader);
+
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
+
+	Rainbow::RemoveShader(pShader);
 
 	Rainbow::RemoveScene(pScene);
 
