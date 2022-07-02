@@ -14,7 +14,6 @@ uint32_t w = 1024, h = 768;
 constexpr uint32_t frameCount = 3;
 Rainbow::Window* pWindow = nullptr;
 Rainbow::Device* pDevice = nullptr;
-//Rainbow::SwapChain* pSwapChain = nullptr;
 
 void Draw() {
 }
@@ -53,7 +52,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::CreateCmd(pDevice, Rainbow::COMMAND_TYPE_GRAPHICS, &pCmd);
 	//Rainbow::SwapChainDesc swapchainDesc{ pWindow->mWindowHandle, frameCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM };
 
-	Rainbow::RemoveCmd(pCmd, true);
+	Rainbow::RemoveCmd(pCmd);
 
 	Rainbow::RemoveDevice(pDevice);
 	Rainbow::RemoveRenderWindow(pWindow);

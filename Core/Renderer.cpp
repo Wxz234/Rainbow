@@ -17,6 +17,38 @@
 #pragma warning(disable : 6031)
 
 namespace Rainbow {
+
+	void CmdReset(Cmd* pCmd) {
+		assert(pCmd);
+		pCmd->pDxCmdAlloc->Reset();
+		pCmd->pDxCmdList->Reset(pCmd->pDxCmdAlloc, nullptr);
+	}
+
+	void CmdClose(Cmd* pCmd) {
+		assert(pCmd);
+		pCmd->pDxCmdList->Close();
+	}
+
+	void CmdResourceBarrier(Cmd* pCmd, ID3D12Resource* pRes, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after) {
+		assert(pCmd);
+		assert(pRes);
+		D3D12_RESOURCE_BARRIER barrier{};
+		if (before == after && before == D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.UAV.pResource = pRes;
+		}
+		else {
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = pRes;
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			barrier.Transition.StateBefore = before;
+			barrier.Transition.StateAfter = after;
+		}
+		pCmd->pDxCmdList->ResourceBarrier(1, &barrier);
+	}
+
 	void CreateDevice(Device** ppDevice) {
 		assert(ppDevice);
 
@@ -43,11 +75,15 @@ namespace Rainbow {
 		allocdesc.pAdapter = pDevice->pDxActiveGPU;
 		D3D12MA::CreateAllocator(&allocdesc, &pDevice->pResourceAllocator);
 
+		CreateCmd(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pCmd);
+
 		*ppDevice = pDevice;
 	}
 
 	void RemoveDevice(Device* pDevice) {
 		assert(pDevice);
+
+		RemoveCmd(pDevice->pCmd);
 
 		for (auto& ptr : pDevice->mAllInterface) {
 			auto refCount = ptr->AddRef();
@@ -126,8 +162,7 @@ namespace Rainbow {
 
 		pCmd->pDxCmdAlloc->Release();
 		pCmd->pDxCmdList->Release();
-		pCmd->pDxCmdAlloc = nullptr;
-		pCmd->pDxCmdList = nullptr;
+
 		delete pCmd;
 	}
 

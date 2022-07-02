@@ -30,6 +30,17 @@ namespace Rainbow {
 		void* pDeviceRef;
 	};
 
+	void CmdReset(Cmd* pCmd);
+	void CmdClose(Cmd* pCmd);
+	void CmdResourceBarrier(Cmd* pCmd, ID3D12Resource* pRes, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
+
+	struct Queue {
+		ID3D12CommandQueue* pDxQueue;
+		ID3D12Fence* pDxFence;
+		HANDLE pDxWaitIdleFenceEvent;
+		uint64_t mFenceValue;
+	};
+
 	struct Device {
 		IDXGIAdapter4* pDxActiveGPU;
 		ID3D12Device7* pDxDevice;
@@ -45,6 +56,9 @@ namespace Rainbow {
 
 	void CreateCmd(Device* pDevice, CommandType mType, Cmd** ppCmd);
 	void RemoveCmd(Cmd* pCmd,bool force = false);
+
+	void CreateQueue(Device* pDevice, CommandType mType, Queue** ppQueue);
+	void RemoveQueue(Queue* pQueue, bool force = false);
 
 	struct SwapChain {
 		IDXGISwapChain4* pDxSwapChain;
