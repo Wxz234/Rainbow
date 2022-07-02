@@ -63,5 +63,107 @@ namespace Rainbow {
 		delete pDevice;
 	}
 
+	void CreateCmd(Device* pDevice, CommandType mType, Cmd** ppCmd) {
+		assert(pDevice);
+		assert(ppCmd);
+		Cmd* pCmd = new Cmd;
+		D3D12_COMMAND_LIST_TYPE listDesc{};
+		if (mType == COMMAND_TYPE_GRAPHICS) {
+			listDesc = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		}
+		else if (mType == COMMAND_TYPE_COMPUTE) {
+			listDesc = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+		}
+		else if (mType == COMMAND_TYPE_COPY) {
+			listDesc = D3D12_COMMAND_LIST_TYPE_COPY;
+		}
+		pDevice->pDxDevice->CreateCommandAllocator(listDesc, IID_PPV_ARGS(&pCmd->pDxCmdAlloc));
+		pDevice->pDxDevice->CreateCommandList1(0, listDesc, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&pCmd->pDxCmdList));
+		pCmd->pDeviceRef = pDevice;
 
+		IUnknown* _save_list = nullptr;
+		IUnknown* _save_alloc = nullptr;
+		pCmd->pDxCmdList->QueryInterface(&_save_list);
+		pCmd->pDxCmdAlloc->QueryInterface(&_save_alloc);
+		pDevice->mAllInterface.push_back(_save_list);
+		pDevice->mAllInterface.push_back(_save_alloc);
+		*ppCmd = pCmd;
+	}
+	void RemoveCmd(Cmd* pCmd, bool force) {
+		assert(pCmd);
+		auto pDevice = (Device*)pCmd->pDeviceRef;
+
+		if (force) {
+			std::erase_if(pDevice->mAllInterface,
+				[&](IUnknown* ptr) 
+				{ 
+					IUnknown* alloc;
+					pCmd->pDxCmdAlloc->QueryInterface(&alloc);
+					if (ptr == alloc) {
+						ptr->Release(); 
+						alloc->Release();
+						return true; 
+					}
+					alloc->Release();
+					return false;
+				}
+			);
+			std::erase_if(pDevice->mAllInterface,
+				[&](IUnknown* ptr)
+				{
+					IUnknown* list;
+					pCmd->pDxCmdList->QueryInterface(&list);
+					if (ptr == list) {
+						ptr->Release();
+						list->Release();
+						return true;
+					}
+					list->Release();
+					return false;
+				}
+			);
+		}
+
+		pCmd->pDxCmdAlloc->Release();
+		pCmd->pDxCmdList->Release();
+		pCmd->pDxCmdAlloc = nullptr;
+		pCmd->pDxCmdList = nullptr;
+		delete pCmd;
+	}
+
+	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain) {
+		assert(pDevice);
+		assert(pDesc);
+		assert(ppSwapChain);
+		SwapChain* pSwapChain = new SwapChain;
+
+		DXGI_SWAP_CHAIN_DESC1 _desc{};
+		_desc.BufferCount = pDesc->mImageCount;
+		_desc.Width = pDesc->mWidth;
+		_desc.Height = pDesc->mHeight;
+		_desc.Format = pDesc->mColorFormat;
+		_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		_desc.SampleDesc.Count = 1;
+		_desc.SampleDesc.Quality = 0;
+		_desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+		_desc.Scaling = DXGI_SCALING_STRETCH;
+
+		DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsSwapChainDesc{};
+		fsSwapChainDesc.Windowed = TRUE;
+
+		Microsoft::WRL::ComPtr<IDXGIFactory7> temp_factory;
+#ifdef _DEBUG
+		CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&temp_factory));
+#else
+		CreateDXGIFactory2(0, IID_PPV_ARGS(&temp_factory));
+#endif //_DEBUG
+		Microsoft::WRL::ComPtr<IDXGISwapChain1> temp_swapchain;
+		//temp_factory->CreateSwapChainForHwnd(pDevice->pQueue->pDxQueue, (HWND)pDesc->mWindowHandle.window, &_desc, &fsSwapChainDesc, nullptr, &temp_swapchain);
+		//temp_swapchain->QueryInterface(&pSwapChain->pDxSwapChain);
+		//temp_factory->MakeWindowAssociation((HWND)pDesc->mWindowHandle.window, DXGI_MWA_NO_WINDOW_CHANGES | DXGI_MWA_NO_ALT_ENTER);
+	}
+	void RemoveSwapChain(SwapChain* pSwapChain) {
+
+	}
 }
