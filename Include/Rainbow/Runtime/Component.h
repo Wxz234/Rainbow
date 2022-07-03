@@ -9,6 +9,6 @@
 
 namespace Rainbow {
 	struct Component {
-
+		virtual ~Component() {}
 	};
 }
