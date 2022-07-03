@@ -15,13 +15,6 @@
 namespace Rainbow {
 	struct Scene {
 
-		void AddGameObject(GameObject* pGo) {
-			mGameObject.push_back(pGo);
-			if (pGo->IsRenderable()) {
-				mRenderableObject.push_back(pGo);
-			}
-		}
-
 		void LoadModelFromFile(const char* file);
 
 		Device* pDevice = nullptr;
