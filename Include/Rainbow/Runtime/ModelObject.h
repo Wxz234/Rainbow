@@ -9,7 +9,14 @@
 
 #include "GameObject.h"
 
+#include <vector>
+
 namespace Rainbow {
 	struct ModelObject : public GameObject {
+
+		virtual bool IsRenderable() { return true; }
+
+	private:
+		
 	};
 }

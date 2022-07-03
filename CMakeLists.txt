@@ -6,15 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(ThirdParty/D3D12MemoryAllocator)
 set_property(TARGET D3D12MemoryAllocator PROPERTY FOLDER "ThirdParty")
 
-add_library(DirectXTex STATIC 
-	ThirdParty/DirectXTex/DDSTextureLoader/DDSTextureLoader12.h
-	ThirdParty/DirectXTex/DDSTextureLoader/DDSTextureLoader12.cpp
-	ThirdParty/DirectXTex/WICTextureLoader/WICTextureLoader12.h
-	ThirdParty/DirectXTex/WICTextureLoader/WICTextureLoader12.cpp
-)
-set_property(TARGET DirectXTex PROPERTY FOLDER "ThirdParty")
-target_include_directories(DirectXTex PRIVATE "ThirdParty/d3dx12/")
-
 add_library(imgui STATIC 
 	ThirdParty/imgui/backends/imgui_impl_win32.cpp
 	ThirdParty/imgui/backends/imgui_impl_win32.h
