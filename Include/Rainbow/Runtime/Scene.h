@@ -25,6 +25,7 @@ namespace Rainbow {
 		Device* pDevice;
 		std::vector<GameObject*> mGameObject;
 		std::vector<GameObject*> mRenderableObject;
+		std::vector<Component*> mComponent;
 	};
 
 	void CreateScene(Device *pDevice, Scene**ppScene);
