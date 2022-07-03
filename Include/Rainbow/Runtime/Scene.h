@@ -22,7 +22,9 @@ namespace Rainbow {
 			}
 		}
 
-		Device* pDevice;
+		void LoadModelFromFile(const char* file);
+
+		Device* pDevice = nullptr;
 		std::vector<GameObject*> mGameObject;
 		std::vector<GameObject*> mRenderableObject;
 		std::vector<Component*> mComponent;

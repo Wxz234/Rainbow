@@ -21,4 +21,8 @@ namespace Rainbow {
 		assert(pScene);
 		delete pScene;
 	}
+
+	void Scene::LoadModelFromFile(const char* file) {
+
+	}
 }
