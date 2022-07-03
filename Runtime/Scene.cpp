@@ -5,8 +5,12 @@
 // https://github.com/Wxz234/Rainbow
 //
 
-#include "../Include/Rainbow/Runtime/Scene.h"	
+#include "../Include/Rainbow/Runtime/Scene.h"
+#include "../Include/Rainbow/Runtime/ModelObject.h"
 
+#include "../ThirdParty/json/json.hpp"
+
+#include <fstream>
 #include <cassert>
 
 namespace Rainbow {
@@ -23,6 +27,8 @@ namespace Rainbow {
 	}
 
 	void Scene::LoadModelFromFile(const char* file) {
-
+		std::ifstream i(file);
+		nlohmann::json j;
+		i >> j;
 	}
 }
