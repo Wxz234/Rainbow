@@ -17,10 +17,14 @@ namespace Rainbow {
 
 		void AddGameObject(GameObject* pGo) {
 			mGameObject.push_back(pGo);
+			if (pGo->IsRenderable()) {
+				mRenderableObject.push_back(pGo);
+			}
 		}
 
 		Device* pDevice;
 		std::vector<GameObject*> mGameObject;
+		std::vector<GameObject*> mRenderableObject;
 	};
 
 	void CreateScene(Device *pDevice, Scene**ppScene);
