@@ -23,4 +23,19 @@ namespace Rainbow {
         float x;
         float y;
     };
+
+    struct Vector3
+    {
+        Vector3() { x = y = z = 0.f; }
+        constexpr Vector3(float x, float y, float z) :x(x), y(y), z(z) {}
+
+        Vector3(const Vector3&) = default;
+        Vector3& operator=(const Vector3&) = default;
+        Vector3(Vector3&&) = default;
+        Vector3& operator=(Vector3&&) = default;
+
+        float x;
+        float y;
+        float z;
+    };
 }
