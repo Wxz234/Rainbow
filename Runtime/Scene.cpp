@@ -23,6 +23,9 @@ namespace Rainbow {
 	}
 	void RemoveScene(Scene* pScene) {
 		assert(pScene);
+		for (auto& go : pScene->mGameObject) {
+			delete go;
+		}
 		delete pScene;
 	}
 
@@ -30,5 +33,8 @@ namespace Rainbow {
 		std::ifstream i(file);
 		nlohmann::json j;
 		i >> j;
+
+		ModelObject* mo = new ModelObject;
+		mGameObject.push_back(mo);
 	}
 }
