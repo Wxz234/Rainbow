@@ -14,12 +14,7 @@
 
 namespace Rainbow {
 	struct ModelObject : public GameObject {
-		ModelObject():mesh(new MeshComponent) {}
-
-		ModelObject(const ModelObject& r) = delete;
-		ModelObject& operator=(const ModelObject& r) = delete;
-		ModelObject(ModelObject&& r) noexcept = default;
-		ModelObject& operator=(ModelObject&& r) noexcept = default;
+		ModelObject(): mesh(new MeshComponent) {}
 
 		virtual bool IsRenderable() { return true; }
 		virtual Component* GetComponent(size_t i) const {
