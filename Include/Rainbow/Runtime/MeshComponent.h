@@ -9,12 +9,13 @@
 
 #include "../Math/Math.h"
 #include "Component.h"
+#include "SubMesh.h"
 
 #include <vector>
 
 namespace Rainbow {
 	struct MeshComponent : public Component {
 		
-		std::vector<Vector2> uv;
+		std::vector<SubMesh> submesh;
 	};
 }
