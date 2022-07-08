@@ -30,7 +30,6 @@ namespace Rainbow {
 	}
 
 	void Scene::LoadModelFromFile(const char* file) {
-
 		GLTFLoader loader(file);
 		
 		ModelObject* mo = new ModelObject;

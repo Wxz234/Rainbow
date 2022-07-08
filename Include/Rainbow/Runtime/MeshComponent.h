@@ -15,7 +15,7 @@
 
 namespace Rainbow {
 	struct MeshComponent : public Component {
-		
+
 		std::vector<SubMesh> submesh;
 	};
 }

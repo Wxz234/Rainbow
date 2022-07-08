@@ -5,6 +5,8 @@
 // https://github.com/Wxz234/Rainbow
 //
 
+#include "../Include/Rainbow/Runtime/SubMesh.h"
+
 #include "../ThirdParty/json/json.hpp"
 
 #include "LoadGLTF.h"
@@ -20,6 +22,7 @@ namespace Rainbow {
 		nlohmann::json gltf;
 		std::vector<std::vector<unsigned char>> m_all_buffer;
 		std::filesystem::path parent_path;
+		std::vector<SubMesh> m_all_submesh;
 	};
 
 	std::string _base64_decode(const std::string& encoded_string) {
