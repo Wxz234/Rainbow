@@ -6,3 +6,13 @@
 //
 
 #pragma once
+
+namespace Rainbow {
+	struct GLTFLoader {
+		GLTFLoader(const char *file);
+		~GLTFLoader();
+	private:
+		class Impl;
+		Impl* pimpl;
+	};
+}

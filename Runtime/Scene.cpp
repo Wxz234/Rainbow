@@ -9,9 +9,8 @@
 #include "../Include/Rainbow/Runtime/ModelObject.h"
 #include "../Include/Rainbow/Runtime/MeshComponent.h"
 
-#include "../ThirdParty/json/json.hpp"
+#include "LoadGLTF.h"
 
-#include <fstream>
 #include <cassert>
 
 namespace Rainbow {
@@ -31,9 +30,8 @@ namespace Rainbow {
 	}
 
 	void Scene::LoadModelFromFile(const char* file) {
-		std::ifstream i(file);
-		nlohmann::json gltf;
-		i >> gltf;
+
+		GLTFLoader loader(file);
 		
 		ModelObject* mo = new ModelObject;
 		mGameObject.push_back(mo);
