@@ -31,8 +31,13 @@ namespace Rainbow {
 
 	void Scene::LoadModelFromFile(const char* file) {
 		GLTFLoader loader(file);
-		
+		auto submesh_size = loader.GetSubMeshSize();
+
 		ModelObject* mo = new ModelObject;
+		for (uint32_t i = 0;i < submesh_size; ++i) {
+			mo->AddSubMesh(loader.GetSubMesh(i));
+		}
+
 		mGameObject.push_back(mo);
 	}  
 }

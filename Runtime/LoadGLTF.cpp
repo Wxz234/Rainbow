@@ -96,9 +96,85 @@ namespace Rainbow {
 
 			pimpl->m_all_buffer.push_back(bufferData);
 		}
+
+		auto mesh_size = gltf["meshes"].size();
+		for (size_t mesh_index = 0; mesh_index < mesh_size; ++mesh_index) {
+			auto primitive_size = gltf["meshes"][mesh_index]["primitives"].size();
+			for (size_t primitive_index = 0; primitive_index < primitive_size; ++primitive_index) {
+				SubMesh submesh;
+				// position
+				{
+					auto accessor_index = gltf["meshes"][mesh_index]["primitives"][primitive_index]["attributes"]["POSITION"].get<int>();
+					auto accessor = gltf["accessors"][accessor_index];
+					auto bufferview_index = accessor["bufferView"].get<int>();
+					auto bufferView = gltf["bufferViews"][bufferview_index];
+					auto buffer_index = bufferView["buffer"].get<int>();
+
+					int ViewbyteOffset = 0, AccessorbyteOffset = 0;
+					if (bufferView.contains("byteOffset")) {
+						ViewbyteOffset = bufferView["byteOffset"].get<int>();
+					}
+					if (accessor.contains("byteOffset")) {
+						AccessorbyteOffset = accessor["byteOffset"].get<int>();
+					}
+					const auto& _buffer = pimpl->m_all_buffer[buffer_index];
+					const float* positions = (const float*)(&_buffer[ViewbyteOffset + AccessorbyteOffset]);
+
+					auto accessor_count = accessor["count"].get<int>();
+
+					for (int i = 0; i < accessor_count; ++i) {
+						submesh.vertices.emplace_back(positions[i + 3], positions[i + 3 + 1], positions[i + 3 + 2]);
+					}
+				}
+				// indices
+				{
+					if (gltf["meshes"][mesh_index]["primitives"][primitive_index].contains("indices")) {
+						auto accessor_index = gltf["meshes"][mesh_index]["primitives"][primitive_index]["indices"].get<int>();
+						auto accessor = gltf["accessors"][accessor_index];
+						auto bufferview_index = accessor["bufferView"].get<int>();
+						auto bufferView = gltf["bufferViews"][bufferview_index];
+						auto buffer_index = bufferView["buffer"].get<int>();
+
+						int ViewbyteOffset = 0, AccessorbyteOffset = 0;
+						if (bufferView.contains("byteOffset")) {
+							ViewbyteOffset = bufferView["byteOffset"].get<int>();
+						}
+						if (accessor.contains("byteOffset")) {
+							AccessorbyteOffset = accessor["byteOffset"].get<int>();
+						}
+
+						const auto& _buffer = pimpl->m_all_buffer[buffer_index];
+						const uint16_t* indices = (const uint16_t*)(&_buffer[ViewbyteOffset + AccessorbyteOffset]);
+
+						auto accessor_count = accessor["count"].get<int>();
+
+						for (int i = 0; i < accessor_count; ++i) {
+							submesh.indices.push_back(indices[i]);
+						}
+
+					}
+					else {
+						auto vertex_size = submesh.vertices.size();
+						for (size_t i = 0;i < vertex_size; ++i) {
+							submesh.indices.push_back(i);
+						}
+					}
+
+				}
+				pimpl->m_all_submesh.push_back(submesh);
+			}
+		}
 	}
 
 	GLTFLoader::~GLTFLoader() {
 		delete pimpl;
+	}
+
+	uint32_t GLTFLoader::GetSubMeshSize() const {
+		return pimpl->m_all_submesh.size();
+	}
+
+	SubMesh GLTFLoader::GetSubMesh(uint32_t i) const {
+		return pimpl->m_all_submesh[i];
 	}
 }
