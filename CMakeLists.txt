@@ -32,6 +32,15 @@ target_compile_definitions(RainbowCore PRIVATE UNICODE _UNICODE)
 add_library(RainbowRuntime STATIC Runtime/Runtime.cpp Runtime/Scene.cpp Runtime/GameObject.cpp Runtime/LoadGLTF.cpp)
 target_compile_definitions(RainbowRuntime PRIVATE UNICODE _UNICODE)
 
+add_library(RainbowShader STATIC
+	Shader/Shader.cpp
+)
+
+target_link_libraries(RainbowShader PRIVATE RainbowCore)
+target_compile_definitions(RainbowShader PRIVATE UNICODE _UNICODE)
+target_include_directories(RainbowShader PRIVATE "${CMAKE_SOURCE_DIR}/Include")
+
+
 add_executable(RainbowEditor WIN32 Editor/Editor.cpp)
 target_compile_definitions(RainbowEditor PRIVATE UNICODE _UNICODE)
 target_link_libraries(RainbowEditor PRIVATE RainbowCore RainbowRuntime)
