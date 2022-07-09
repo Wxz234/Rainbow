@@ -5,8 +5,6 @@
 // https://github.com/Wxz234/Rainbow
 //
 
-#include "../Include/Rainbow/Runtime/SubMesh.h"
-
 #include "../ThirdParty/json/json.hpp"
 
 #include "LoadGLTF.h"

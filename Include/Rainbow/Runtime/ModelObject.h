@@ -25,9 +25,8 @@ namespace Rainbow {
 		}
 		virtual size_t GetComponentSize() const { return 1; }
 
-
 		void AddSubMesh(const SubMesh &submesh) {
-			mesh->submesh.push_back(submesh);
+			mesh->AddSubMesh(submesh);
 		}
 	private:
 		std::unique_ptr<MeshComponent> mesh;
