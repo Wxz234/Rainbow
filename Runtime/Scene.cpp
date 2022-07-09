@@ -25,13 +25,17 @@ namespace Rainbow {
 	}
 
 	Scene::Scene(Device* pDevice) {
-
+		this->pDevice = pDevice;
+		pGQueue = pDevice->pQueue;
+		CreateQueue(pDevice, COMMAND_TYPE_COMPUTE, &pCQueue);
 	}
 
 	Scene::~Scene() {
 		for (auto &x: mGameObject) {
 			delete x;
 		}
+
+		RemoveQueue(pCQueue, true);
 	}
 
 	void Scene::LoadModelFromFile(const char* file) {

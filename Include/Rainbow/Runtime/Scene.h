@@ -11,6 +11,7 @@
 #include "GameObject.h"
 
 #include <vector>
+#include <d3d12.h>
 
 namespace Rainbow {
 	struct Scene {
@@ -18,12 +19,15 @@ namespace Rainbow {
 		~Scene();
 		void LoadModelFromFile(const char* file);
 		void Draw();
+
 	private:
-		Device* pDevice = nullptr;
-		Queue* pQueue = nullptr;
+		Device* pDevice;
+		Queue* pGQueue;
+		Queue* pCQueue;
 		std::vector<GameObject*> mGameObject;
 		std::vector<GameObject*> mRenderableObject;
 		std::vector<Component*> mComponent;
+		ID3D12PipelineState* pPipeline;
 	};
 
 	void CreateScene(Device *pDevice, Scene**ppScene);

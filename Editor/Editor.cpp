@@ -65,7 +65,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	pScene->LoadModelFromFile("C:\\Users\\42937\\Desktop\\glTF-Sample-Models-master\\2.0\\Box\\glTF\\Box.gltf");
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
-
+	
+	Rainbow::RemoveScene(pScene);
 	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveDevice(pDevice);
 	Rainbow::RemoveRenderWindow(pWindow);
