@@ -39,5 +39,9 @@ namespace Rainbow {
 		}
 
 		mGameObject.push_back(mo);
-	}  
+	}
+
+	void Scene::Draw() {
+
+	}
 }

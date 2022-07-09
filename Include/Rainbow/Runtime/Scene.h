@@ -16,6 +16,7 @@ namespace Rainbow {
 	struct Scene {
 
 		void LoadModelFromFile(const char* file);
+		void Draw();
 
 		Device* pDevice = nullptr;
 		std::vector<GameObject*> mGameObject;
