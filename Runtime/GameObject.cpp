@@ -10,11 +10,12 @@
 #include <atomic>
 
 namespace Rainbow {
-	uint32_t GameObject::GetID() {
+
+	GameObject::GameObject() {
 		static std::atomic<uint32_t> _id(0);
-		if (!ID.has_value()) {
-			ID = _id++;
-		}
-		return ID.value();
+		m_id = _id++;
+	}
+	uint32_t GameObject::GetID() const {
+		return m_id;
 	}
 }

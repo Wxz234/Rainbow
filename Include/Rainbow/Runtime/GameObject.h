@@ -11,17 +11,17 @@
 
 #include <cstdint>
 #include <cstddef>
-#include <optional>
 
 namespace Rainbow {
 	struct GameObject {
+		GameObject();
 		virtual ~GameObject() {}
 		virtual bool IsRenderable() { return false; }
 		virtual Component* GetComponent(size_t i) const = 0;
 		virtual size_t GetComponentSize() const = 0;
 
-		uint32_t GetID();
-	protected:
-		std::optional<uint32_t> ID;
+		uint32_t GetID() const;
+	private:
+		uint32_t m_id;
 	};
 }
