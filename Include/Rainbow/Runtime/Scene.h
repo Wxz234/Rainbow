@@ -14,11 +14,13 @@
 
 namespace Rainbow {
 	struct Scene {
-
+		Scene(Device* pDevice);
+		~Scene();
 		void LoadModelFromFile(const char* file);
 		void Draw();
-
+	private:
 		Device* pDevice = nullptr;
+		Queue* pQueue = nullptr;
 		std::vector<GameObject*> mGameObject;
 		std::vector<GameObject*> mRenderableObject;
 		std::vector<Component*> mComponent;

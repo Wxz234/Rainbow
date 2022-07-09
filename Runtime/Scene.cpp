@@ -16,16 +16,22 @@ namespace Rainbow {
 	void CreateScene(Device* pDevice, Scene** ppScene) {
 		assert(pDevice);
 		assert(ppScene);
-		Scene* pScene = new Scene;
-		pScene->pDevice = pDevice;
+		Scene* pScene = new Scene(pDevice);
 		*ppScene = pScene;
 	}
 	void RemoveScene(Scene* pScene) {
 		assert(pScene);	
-		for (auto& go : pScene->mGameObject) {
-			delete go;
-		}
 		delete pScene;
+	}
+
+	Scene::Scene(Device* pDevice) {
+
+	}
+
+	Scene::~Scene() {
+		for (auto &x: mGameObject) {
+			delete x;
+		}
 	}
 
 	void Scene::LoadModelFromFile(const char* file) {
