@@ -7,7 +7,6 @@
 
 #include "../Include/Rainbow/Runtime/Scene.h"
 #include "../Include/Rainbow/Runtime/ModelObject.h"
-#include "../Include/Rainbow/Runtime/MeshComponent.h"
 
 #include "LoadGLTF.h"
 
