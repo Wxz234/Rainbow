@@ -16,8 +16,10 @@ constexpr uint32_t frameCount = 3;
 Rainbow::Window* pWindow = nullptr;
 Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
+Rainbow::Scene* pScene = nullptr;
 
 void Draw() {
+	pScene->Draw();
 	Rainbow::BeginDraw(pSwapChain);
 	Rainbow::EndDraw(pSwapChain);
 }
@@ -59,7 +61,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::SwapChainDesc swapchainDesc{ pWindow->mWindowHandle, frameCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pDevice, &swapchainDesc, &pSwapChain);
 
-	Rainbow::Scene* pScene = nullptr;
 	Rainbow::CreateScene(pDevice, &pScene);
 	pScene->LoadModelFromFile("C:\\Users\\42937\\Desktop\\glTF-Sample-Models-master\\2.0\\Box\\glTF\\Box.gltf");
 	Rainbow::RenderWindowShow(pWindow);

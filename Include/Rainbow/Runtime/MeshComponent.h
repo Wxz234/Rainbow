@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "../Math/Math.h"
 #include "Component.h"
 #include "SubMesh.h"
 
