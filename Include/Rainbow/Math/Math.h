@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <DirectXMath.h>
-
 namespace Rainbow {
     struct Vector2
     {
@@ -56,12 +54,12 @@ namespace Rainbow {
     };
 
     struct Matrix {
-        Matrix() = default;
+        Matrix() {}
         Matrix(const Matrix&) = default;
         Matrix& operator=(const Matrix&) = default;
         Matrix(Matrix&&) = default;
         Matrix& operator=(Matrix&&) = default;
 
-        Vector4 r[4];
+        Vector4 r[4]{};
     };
 }
