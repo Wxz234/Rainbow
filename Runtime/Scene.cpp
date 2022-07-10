@@ -7,6 +7,7 @@
 
 #include "../Include/Rainbow/Runtime/Scene.h"
 #include "../Include/Rainbow/Runtime/ModelObject.h"
+#include "../Include/Rainbow/Runtime/CameraObject.h"
 
 //#include "../Shader/VertexShader.h"
 

@@ -11,6 +11,14 @@ VSQuadOut getoutput(uint index) {
 	return Out;
 }
 
+struct Meshlet {
+
+};
+
+cbuffer CameraData : register(b0) {
+
+};
+
 [NumThreads(1, 1, 1)]
 [OutputTopology("triangle")]
 void main(
