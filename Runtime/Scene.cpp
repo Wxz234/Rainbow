@@ -8,6 +8,8 @@
 #include "../Include/Rainbow/Runtime/Scene.h"
 #include "../Include/Rainbow/Runtime/ModelObject.h"
 
+//#include "../Shader/VertexShader.h"
+
 #include "LoadGLTF.h"
 
 #include <cassert>
