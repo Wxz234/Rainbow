@@ -66,6 +66,8 @@ namespace Rainbow {
 
 	Matrix CameraObject::GetViewMatrix() const {
 
+        Vector3 R2 = Vector3Normalize(dir);
+
 		return Matrix();
 	}
 	Matrix CameraObject::GetPerspectiveMatrix() const {

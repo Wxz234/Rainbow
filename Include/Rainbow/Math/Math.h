@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <cmath>
+
 namespace Rainbow {
     struct Vector2
     {
@@ -36,6 +38,16 @@ namespace Rainbow {
         float y;
         float z;
     };
+
+    inline float Vector3Dot(const Vector3& a, const Vector3& b) {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
+
+    inline Vector3 Vector3Normalize(const Vector3& v) {
+        float _len = sqrtf(Vector3Dot(v, v));
+        _len = 1.0f / _len;
+        return Vector3(v.x * _len, v.y * _len, v.z * _len);
+    }
 
     struct Vector4
     {
