@@ -8,27 +8,21 @@
 #pragma once
 
 #include "GameObject.h"
-#include "MeshComponent.h"
+#include "SubMesh.h"
 
 #include <memory>
+#include <vector>
 
 namespace Rainbow {
 	struct ModelObject : public GameObject {
-		ModelObject(): mesh(new MeshComponent) {}
+		ModelObject() {}
 
 		virtual bool IsRenderable() { return true; }
-		virtual Component* GetComponent(size_t i) const {
-			if (i == 0) {
-				return mesh.get();
-			}
-			return nullptr;
-		}
-		virtual size_t GetComponentSize() const { return 1; }
 
 		void AddSubMesh(const SubMesh &submesh) {
-			mesh->AddSubMesh(submesh);
+			submeshes.push_back(submesh);
 		}
 	private:
-		std::unique_ptr<MeshComponent> mesh;
+		std::vector<SubMesh> submeshes;
 	};
 }

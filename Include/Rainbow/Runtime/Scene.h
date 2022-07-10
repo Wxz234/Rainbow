@@ -26,7 +26,6 @@ namespace Rainbow {
 		Queue* pCQueue;
 		std::vector<GameObject*> mGameObject;
 		std::vector<GameObject*> mRenderableObject;
-		std::vector<Component*> mComponent;
 		ID3D12PipelineState* pPipeline;
 	};
 
