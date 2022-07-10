@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "../Math/Math.h"
+
 #include "GameObject.h"
 
 namespace Rainbow {
@@ -14,6 +16,12 @@ namespace Rainbow {
 		virtual bool IsRenderable() { return false; }
 
 	private:
-
+		Vector3 pos;
+		Vector3 dir;
+		Vector3 up;
+		float FovAngleY;
+		float AspectRatio;
+		float NearZ;
+		float FarZ;
 	};
 }
