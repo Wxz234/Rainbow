@@ -24,9 +24,9 @@ namespace Rainbow {
 		Device* pDevice;
 		Queue* pGQueue;
 		Queue* pCQueue;
+
 		std::vector<GameObject*> mGameObject;
-		std::vector<GameObject*> mRenderableObject;
-		ID3D12PipelineState* pPipeline;
+		GameObject* mMainCamera;
 	};
 
 	void CreateScene(Device *pDevice, Scene**ppScene);

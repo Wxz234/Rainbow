@@ -10,7 +10,6 @@
 #include "GameObject.h"
 #include "SubMesh.h"
 
-#include <memory>
 #include <vector>
 
 namespace Rainbow {
