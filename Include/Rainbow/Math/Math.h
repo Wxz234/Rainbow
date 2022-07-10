@@ -38,4 +38,30 @@ namespace Rainbow {
         float y;
         float z;
     };
+
+    struct Vector4
+    {
+        Vector4() { x = y = z = w = 0.f; }
+        constexpr Vector4(float x, float y, float z, float w) :x(x), y(y), z(z), w(w) {}
+
+        Vector4(const Vector4&) = default;
+        Vector4& operator=(const Vector4&) = default;
+        Vector4(Vector4&&) = default;
+        Vector4& operator=(Vector4&&) = default;
+
+        float x;
+        float y;
+        float z;
+        float w;
+    };
+
+    struct Matrix {
+        Matrix() = default;
+        Matrix(const Matrix&) = default;
+        Matrix& operator=(const Matrix&) = default;
+        Matrix(Matrix&&) = default;
+        Matrix& operator=(Matrix&&) = default;
+
+        Vector4 r[4];
+    };
 }
