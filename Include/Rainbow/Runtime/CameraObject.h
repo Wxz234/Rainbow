@@ -14,11 +14,12 @@
 namespace Rainbow {
 	struct CameraObject : public GameObject {
 		virtual bool IsRenderable() { return false; }
-
+		Matrix GetViewMatrix() const;
+		Matrix GetPerspectiveMatrix() const;
 	private:
-		Vector3 pos;
-		Vector3 dir;
-		Vector3 up;
+		Vector3 pos{ .0f, .0f, .0f };
+		Vector3 dir{ .0f, .0f, 1.f };
+		Vector3 up { .0f, 1.f, .0f };
 		float FovAngleY;
 		float AspectRatio;
 		float NearZ;

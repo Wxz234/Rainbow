@@ -35,7 +35,13 @@ add_library(RainbowShader STATIC
 	Shader/Shader.cpp
 )
 
-add_library(RainbowRuntime STATIC Runtime/Runtime.cpp Runtime/Scene.cpp Runtime/GameObject.cpp Runtime/LoadGLTF.cpp)
+add_library(RainbowRuntime STATIC 
+	Runtime/Runtime.cpp 
+	Runtime/Scene.cpp 
+	Runtime/GameObject.cpp 
+	Runtime/LoadGLTF.cpp
+	Runtime/CameraObject.cpp
+)
 target_compile_definitions(RainbowRuntime PRIVATE UNICODE _UNICODE)
 target_link_libraries(RainbowRuntime PRIVATE RainbowShader)
 
