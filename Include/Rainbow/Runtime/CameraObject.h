@@ -13,6 +13,7 @@
 
 namespace Rainbow {
 	struct CameraObject : public GameObject {
+		CameraObject() {}
 		CameraObject(const CameraObject&) = default;
 		CameraObject& operator=(const CameraObject&) = default;
 		CameraObject(CameraObject&&) = default;
@@ -24,9 +25,9 @@ namespace Rainbow {
 		Vector3 pos{ .0f, .0f, .0f };
 		Vector3 dir{ .0f, .0f, 1.f };
 		Vector3 up { .0f, 1.f, .0f };
-		float FovAngleY;
-		float AspectRatio;
-		float NearZ;
-		float FarZ;
+		float FovAngleY = DirectX::XM_PIDIV4;
+		float AspectRatio = 1.f;
+		float NearZ = 1.f;
+		float FarZ = 1000.f;
 	};
 }

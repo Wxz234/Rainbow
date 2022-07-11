@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <cmath>
+#include <DirectXMath.h>
 
 namespace Rainbow {
     struct Vector2
