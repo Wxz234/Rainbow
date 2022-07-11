@@ -47,6 +47,11 @@ namespace Rainbow {
         return pDestination;
     }
 
+    inline DirectX::FXMVECTOR GetXMVector3(const Vector3& v) {
+        DirectX::XMFLOAT3 temp(v.x, v.y, v.z);
+        return DirectX::XMLoadFloat3(&temp);
+    }
+
     struct Vector4
     {
         Vector4() { x = y = z = w = 0.f; }
@@ -71,4 +76,13 @@ namespace Rainbow {
 
         Vector4 r[4]{};
     };
+
+    inline Matrix GetMatrix(DirectX::FXMMATRIX M) {
+        Matrix pDestination;
+        _mm_storeu_ps((float*)(&pDestination.r[0]), M.r[0]);
+        _mm_storeu_ps((float*)(&pDestination.r[1]), M.r[1]);
+        _mm_storeu_ps((float*)(&pDestination.r[2]), M.r[2]);
+        _mm_storeu_ps((float*)(&pDestination.r[3]), M.r[3]);
+        return pDestination;
+    }
 }

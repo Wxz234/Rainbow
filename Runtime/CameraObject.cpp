@@ -9,10 +9,14 @@
 namespace Rainbow {
 
 	Matrix CameraObject::GetViewMatrix() const {
-
-		return Matrix();
+		auto _pos = GetXMVector3(pos);
+		auto _dir = GetXMVector3(dir);
+		auto _up = GetXMVector3(up);
+		auto m = DirectX::XMMatrixLookToLH(_pos, _dir, _up);
+		return GetMatrix(m);
 	}
 	Matrix CameraObject::GetPerspectiveMatrix() const {
-		return Matrix();
+		auto m = DirectX::XMMatrixPerspectiveFovLH(FovAngleY, AspectRatio, NearZ, FarZ);
+		return GetMatrix(m);
 	}
 }
