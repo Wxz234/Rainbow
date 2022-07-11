@@ -5,7 +5,7 @@
 // https://github.com/Wxz234/Rainbow
 //
 
-#include "../Include/Rainbow/Runtime/GameObject.h"	
+#include "../Include/Rainbow/Runtime/GameObject.h"
 
 #include <atomic>
 
