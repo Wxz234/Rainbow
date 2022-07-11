@@ -35,8 +35,7 @@ add_library(RainbowShader STATIC
 	Shader/Shader.cpp
 )
 
-add_library(RainbowRuntime STATIC 
-	Runtime/Runtime.cpp 
+add_library(RainbowRuntime STATIC
 	Runtime/Scene.cpp 
 	Runtime/GameObject.cpp 
 	Runtime/LoadGLTF.cpp
