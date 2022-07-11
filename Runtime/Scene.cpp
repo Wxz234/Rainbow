@@ -31,7 +31,7 @@ namespace Rainbow {
 		this->pDevice = pDevice;
 		pGQueue = pDevice->pQueue;
 		CreateQueue(pDevice, COMMAND_TYPE_COMPUTE, &pCQueue);
-		mMainCamera = new CameraObject;
+		//mMainCamera = new CameraObject;
 		//D3DX12_MESH_SHADER_PIPELINE_STATE_DESC meshDesc = {};
 		//meshDesc.pRootSignature = rootsignature.Get();
 		//meshDesc.MS = { TestMeshShader,sizeof(TestMeshShader) };

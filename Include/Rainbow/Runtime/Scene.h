@@ -16,6 +16,10 @@
 namespace Rainbow {
 	struct Scene {
 		Scene(Device* pDevice);
+		Scene(const Scene&) = delete;
+		Scene& operator=(const Scene&) = delete;
+		Scene(Scene&&) = delete;
+		Scene& operator=(Scene&&) = delete;
 		~Scene();
 		void LoadModelFromFile(const char* file);
 		void Draw();
