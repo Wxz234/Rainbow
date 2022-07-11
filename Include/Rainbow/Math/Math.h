@@ -37,6 +37,16 @@ namespace Rainbow {
         float z;
     };
 
+    inline Vector3 GetVector3(DirectX::FXMVECTOR V) {
+        Vector3 pDestination;
+        DirectX::XMVECTOR T1 = XM_PERMUTE_PS(V, _MM_SHUFFLE(1, 1, 1, 1));
+        DirectX::XMVECTOR T2 = XM_PERMUTE_PS(V, _MM_SHUFFLE(2, 2, 2, 2));
+        _mm_store_ss(&pDestination.x, V);
+        _mm_store_ss(&pDestination.y, T1);
+        _mm_store_ss(&pDestination.z, T2);
+        return pDestination;
+    }
+
     struct Vector4
     {
         Vector4() { x = y = z = w = 0.f; }
