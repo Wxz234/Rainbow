@@ -13,6 +13,10 @@
 
 namespace Rainbow {
 	struct CameraObject : public GameObject {
+		CameraObject(const CameraObject&) = default;
+		CameraObject& operator=(const CameraObject&) = default;
+		CameraObject(CameraObject&&) = default;
+		CameraObject& operator=(CameraObject&&) = default;
 		virtual bool IsRenderable() { return false; }
 		Matrix GetViewMatrix() const;
 		Matrix GetPerspectiveMatrix() const;

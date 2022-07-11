@@ -15,6 +15,10 @@
 namespace Rainbow {
 	struct ModelObject : public GameObject {
 		ModelObject() {}
+		ModelObject(const ModelObject&) = default;
+		ModelObject& operator=(const ModelObject&) = default;
+		ModelObject(ModelObject&&) = default;
+		ModelObject& operator=(ModelObject&&) = default;
 
 		virtual bool IsRenderable() { return true; }
 
