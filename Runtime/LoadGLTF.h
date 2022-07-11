@@ -16,6 +16,11 @@ namespace Rainbow {
 		GLTFLoader(const char *file);
 		~GLTFLoader();
 
+		GLTFLoader(const GLTFLoader&) = delete;
+		GLTFLoader& operator=(const GLTFLoader&) = delete;
+		GLTFLoader(GLTFLoader&&) = delete;
+		GLTFLoader& operator=(GLTFLoader&&) = delete;
+
 		uint32_t GetSubMeshSize() const;
 		SubMesh GetSubMesh(uint32_t i) const;
 	private:
