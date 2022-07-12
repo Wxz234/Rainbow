@@ -11,7 +11,6 @@
 #include "GameObject.h"
 
 #include <vector>
-#include <d3d12.h>
 
 namespace Rainbow {
 	struct Scene {
