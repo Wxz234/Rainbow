@@ -30,26 +30,7 @@ namespace Rainbow {
 		pGQueue = pDevice->pQueue;
 		CreateQueue(pDevice, COMMAND_TYPE_COMPUTE, &pCQueue);
 		mMainCamera = new CameraObject;
-		//D3DX12_MESH_SHADER_PIPELINE_STATE_DESC meshDesc = {};
-		//meshDesc.pRootSignature = rootsignature.Get();
-		//meshDesc.MS = { TestMeshShader,sizeof(TestMeshShader) };
-		//meshDesc.PS = { PostProcessPS,sizeof(PostProcessPS) };
-		//meshDesc.NumRenderTargets = 1;
-		//meshDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-		//meshDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);    // CW front; cull back
-		//meshDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);         // Opaque
-		//meshDesc.DepthStencilState.DepthEnable = FALSE;
-		//meshDesc.DepthStencilState.StencilEnable = FALSE;
-		//meshDesc.SampleMask = UINT_MAX;
-		//meshDesc.SampleDesc = DefaultSampleDesc();
 
-		//auto psoStream = CD3DX12_PIPELINE_MESH_STATE_STREAM(meshDesc);
-
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineDesc = {};
-
-		//D3D12_PIPELINE_STATE_STREAM_DESC streamDesc;
-		//streamDesc.pPipelineStateSubobjectStream = &psoStream;
-		//streamDesc.SizeInBytes = sizeof(psoStream);
 	}
 
 	Scene::~Scene() {
@@ -71,6 +52,10 @@ namespace Rainbow {
 		}
 
 		mGameObject.push_back(mo);
+	}
+
+	void Scene::UpdateCameraPerspective(float FovAngleY, float AspectRatio, float NearZ, float FarZ) {
+		((CameraObject*)mMainCamera)->UpdatePerspective(FovAngleY, AspectRatio, NearZ, FarZ);
 	}
 
 	void Scene::Draw() {

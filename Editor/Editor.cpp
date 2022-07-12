@@ -38,8 +38,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_GETMINMAXINFO:
-		if (lParam)
-		{
+		if (lParam) {
 			auto info = reinterpret_cast<MINMAXINFO*>(lParam);
 			info->ptMinTrackSize.x = 320;
 			info->ptMinTrackSize.y = 200;
@@ -62,6 +61,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::CreateSwapChain(pDevice, &swapchainDesc, &pSwapChain);
 
 	Rainbow::CreateScene(pDevice, &pScene);
+	pScene->UpdateCameraPerspective(0.785398163f, static_cast<float>(w) / static_cast<float>(h), 0.1f, 1000.f);
 	pScene->LoadModelFromFile("C:\\Users\\42937\\Desktop\\glTF-Sample-Models-master\\2.0\\Box\\glTF\\Box.gltf");
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);

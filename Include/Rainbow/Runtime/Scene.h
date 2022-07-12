@@ -21,6 +21,8 @@ namespace Rainbow {
 		Scene& operator=(Scene&&) = delete;
 		~Scene();
 		void LoadModelFromFile(const char* file);
+		void UpdateCameraPerspective(float FovAngleY, float AspectRatio, float NearZ, float FarZ);
+
 		void Draw();
 
 	private:

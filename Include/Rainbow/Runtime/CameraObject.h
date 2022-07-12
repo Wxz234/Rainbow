@@ -21,6 +21,12 @@ namespace Rainbow {
 		virtual bool IsRenderable() { return false; }
 		Matrix GetViewMatrix() const;
 		Matrix GetPerspectiveMatrix() const;
+		void UpdatePerspective(float FovAngleY, float AspectRatio, float NearZ, float FarZ) {
+			this->FovAngleY = FovAngleY;
+			this->AspectRatio = AspectRatio;
+			this->NearZ = NearZ;
+			this->FarZ = FarZ;
+		}
 	private:
 		Vector3 pos{ .0f, .0f, .0f };
 		Vector3 dir{ .0f, .0f, 1.f };
