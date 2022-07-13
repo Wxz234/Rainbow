@@ -120,6 +120,10 @@ namespace Rainbow {
 		CreateQueue(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pQueue);
 		CreateCmd(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pCmd);
 
+		//IDxcCompiler* pCompiler;
+
+		//DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&pCompiler));
+
 		*ppDevice = pDevice;
 	}
 
