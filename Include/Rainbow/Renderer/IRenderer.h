@@ -7,13 +7,13 @@
 
 #pragma once
 
+#include "../Core/Core.h"
 #include "../Window/Window.h"
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <vector>
 #include <cstdint>
-#include <string>
 #include <dxcapi.h>
 
 namespace Rainbow {
@@ -31,9 +31,9 @@ namespace Rainbow {
 		void* pDeviceRef;
 	};
 
-	void CmdReset(Cmd* pCmd);
-	void CmdClose(Cmd* pCmd);
-	void CmdResourceBarrier(Cmd* pCmd, ID3D12Resource* pRes, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
+	RAINBOW_EXPORT void CmdReset(Cmd* pCmd);
+	RAINBOW_EXPORT void CmdClose(Cmd* pCmd);
+	RAINBOW_EXPORT void CmdResourceBarrier(Cmd* pCmd, ID3D12Resource* pRes, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);
 
 	struct Queue {
 		ID3D12CommandQueue* pDxQueue;
@@ -44,8 +44,8 @@ namespace Rainbow {
 		void* pDeviceRef;
 	};
 
-	void QueueExecute(Queue* pQueue, Cmd* pCmd);
-	void QueueWait(Queue* pQueue);
+	RAINBOW_EXPORT void QueueExecute(Queue* pQueue, Cmd* pCmd);
+	RAINBOW_EXPORT void QueueWait(Queue* pQueue);
 
 	struct Device {
 		IDXGIAdapter4* pDxActiveGPU;
@@ -57,14 +57,14 @@ namespace Rainbow {
 		std::vector<IUnknown*> mAllInterface;
 	};
 
-	void CreateDevice(Device** ppDevice);
-	void RemoveDevice(Device* pDevice);
+	RAINBOW_EXPORT void CreateDevice(Device** ppDevice);
+	RAINBOW_EXPORT void RemoveDevice(Device* pDevice);
 
-	void CreateCmd(Device* pDevice, CommandType mType, Cmd** ppCmd);
-	void RemoveCmd(Cmd* pCmd,bool force = false);
+	RAINBOW_EXPORT void CreateCmd(Device* pDevice, CommandType mType, Cmd** ppCmd);
+	RAINBOW_EXPORT void RemoveCmd(Cmd* pCmd,bool force = false);
 
-	void CreateQueue(Device* pDevice, CommandType mType, Queue** ppQueue);
-	void RemoveQueue(Queue* pQueue, bool force = false);
+	RAINBOW_EXPORT void CreateQueue(Device* pDevice, CommandType mType, Queue** ppQueue);
+	RAINBOW_EXPORT void RemoveQueue(Queue* pQueue, bool force = false);
 
 	struct SwapChain {
 		IDXGISwapChain4* pDxSwapChain;
@@ -85,11 +85,11 @@ namespace Rainbow {
 		DXGI_FORMAT mColorFormat;
 	};
 
-	void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
-	void RemoveSwapChain(SwapChain* pSwapChain, bool force = false);
-	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
-	void BeginDraw(SwapChain* pSwapChain);
-	void EndDraw(SwapChain* pSwapChain);
+	RAINBOW_EXPORT void CreateSwapChain(Device* pDevice, SwapChainDesc* pDesc, SwapChain** ppSwapChain);
+	RAINBOW_EXPORT void RemoveSwapChain(SwapChain* pSwapChain, bool force = false);
+	RAINBOW_EXPORT void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
+	RAINBOW_EXPORT void BeginDraw(SwapChain* pSwapChain);
+	RAINBOW_EXPORT void EndDraw(SwapChain* pSwapChain);
 
 	enum ShaderStage
 	{
@@ -109,7 +109,7 @@ namespace Rainbow {
 		IDxcBlob* pBlob;
 	};
 
-	void CreateShaderFromFile(Device* pDevice, std::string file_path, ShaderDesc* pDesc, Shader** ppShader);
-	void CreateShaderFromString(Device* pDevice, std::string shader_string, ShaderDesc* pDesc, Shader** ppShader);
-	void RemoveShader(Shader* pShader,bool force = false);
+	RAINBOW_EXPORT void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader);
+	RAINBOW_EXPORT void CreateShaderFromString(Device* pDevice, const char* shader_string, ShaderDesc* pDesc, Shader** ppShader);
+	RAINBOW_EXPORT void RemoveShader(Shader* pShader,bool force = false);
 }

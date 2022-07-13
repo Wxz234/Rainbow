@@ -18,6 +18,9 @@
 #include <vector>
 
 #pragma warning(disable : 6031)
+#pragma comment(lib,"d3d12.lib")
+#pragma comment(lib,"dxgi.lib")
+#pragma comment(lib,"dxguid.lib")
 
 namespace Rainbow {
 
@@ -353,13 +356,7 @@ namespace Rainbow {
 		}
 	}
 
-	void CreateShaderFromFile(Device* pDevice, std::string file_path, ShaderDesc* pDesc, Shader** ppShader) {
-
-	}
-	void CreateShaderFromString(Device* pDevice, std::string shader_string, ShaderDesc* pDesc, Shader** ppShader) {
-
-	}
-	void RemoveShader(Shader* pShader, bool force) {
-		assert(pShader);
-	}
+	void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader) {}
+	void CreateShaderFromString(Device* pDevice, const char* shader_string, ShaderDesc* pDesc, Shader** ppShader) {}
+	void RemoveShader(Shader* pShader, bool force) {}
 }
