@@ -114,12 +114,6 @@ namespace Rainbow {
 		temp_factory->EnumAdapterByGpuPreference(0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&pDevice->pDxActiveGPU));
 		D3D12CreateDevice(pDevice->pDxActiveGPU, (D3D_FEATURE_LEVEL)0xc200, IID_PPV_ARGS(&pDevice->pDxDevice));
 
-		D3D12MA::ALLOCATOR_DESC allocdesc = {};
-		allocdesc.Flags = D3D12MA::ALLOCATOR_FLAG_NONE;
-		allocdesc.pDevice = pDevice->pDxDevice;
-		allocdesc.pAdapter = pDevice->pDxActiveGPU;
-		D3D12MA::CreateAllocator(&allocdesc, &pDevice->pResourceAllocator);
-
 		CreateQueue(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pQueue);
 		CreateCmd(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pCmd);
 
@@ -136,7 +130,6 @@ namespace Rainbow {
 			assert(refCount == 0);
 		}
 
-		pDevice->pResourceAllocator->Release();
 		pDevice->pDxDevice->Release();
 		pDevice->pDxActiveGPU->Release();
 

@@ -7,7 +7,6 @@
 
 #include "../Include/Rainbow/Window/Window.h"
 #include "../Include/Rainbow/Renderer/IRenderer.h"
-#include "../Include/Rainbow/Runtime/Scene.h"
 
 #include <Windows.h>
 
@@ -16,10 +15,8 @@ constexpr uint32_t frameCount = 3;
 Rainbow::Window* pWindow = nullptr;
 Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
-Rainbow::Scene* pScene = nullptr;
 
 void Draw() {
-	pScene->Draw();
 	Rainbow::BeginDraw(pSwapChain);
 	Rainbow::EndDraw(pSwapChain);
 }
@@ -60,13 +57,9 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::SwapChainDesc swapchainDesc{ pWindow->mWindowHandle, frameCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pDevice, &swapchainDesc, &pSwapChain);
 
-	Rainbow::CreateScene(pDevice, &pScene);
-	pScene->UpdateCameraPerspective(0.785398163f, static_cast<float>(w) / static_cast<float>(h), 0.1f, 1000.f);
-	pScene->LoadModelFromFile("C:\\Users\\42937\\Desktop\\glTF-Sample-Models-master\\2.0\\Box\\glTF\\Box.gltf");
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
 	
-	Rainbow::RemoveScene(pScene);
 	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveDevice(pDevice);
 	Rainbow::RemoveRenderWindow(pWindow);
