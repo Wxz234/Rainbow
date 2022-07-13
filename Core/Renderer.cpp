@@ -366,7 +366,7 @@ namespace Rainbow {
 	void CreateShaderFromString(Device* pDevice, std::string shader_string, ShaderDesc* pDesc, Shader** ppShader) {
 
 	}
-	void RemoveShader(Shader* pShader) {
+	void RemoveShader(Shader* pShader, bool force) {
 		assert(pShader);
 	}
 }

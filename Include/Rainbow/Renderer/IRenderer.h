@@ -16,6 +16,7 @@
 #include <vector>
 #include <cstdint>
 #include <string>
+#include <dxcapi.h>
 
 namespace Rainbow {
 	enum CommandType
@@ -108,11 +109,10 @@ namespace Rainbow {
 
 	struct Shader {
 		ShaderStage mStages;
-		void* pByteCode;
-		uint32_t mByteCodeSize;
+		IDxcBlob* pBlob;
 	};
 
 	void CreateShaderFromFile(Device* pDevice, std::string file_path, ShaderDesc* pDesc, Shader** ppShader);
 	void CreateShaderFromString(Device* pDevice, std::string shader_string, ShaderDesc* pDesc, Shader** ppShader);
-	void RemoveShader(Shader* pShader);
+	void RemoveShader(Shader* pShader,bool force = false);
 }
