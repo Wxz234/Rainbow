@@ -359,4 +359,14 @@ namespace Rainbow {
 			WaitForSingleObjectEx(pDevice->pQueue->pDxWaitIdleFenceEvent, INFINITE, FALSE);
 		}
 	}
+
+	void CreateShaderFromFile(Device* pDevice, std::string file_path, ShaderDesc* pDesc, Shader** ppShader) {
+
+	}
+	void CreateShaderFromString(Device* pDevice, std::string shader_string, ShaderDesc* pDesc, Shader** ppShader) {
+
+	}
+	void RemoveShader(Shader* pShader) {
+		assert(pShader);
+	}
 }

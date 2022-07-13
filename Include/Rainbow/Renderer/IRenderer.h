@@ -15,6 +15,7 @@
 #include <dxgi1_6.h>
 #include <vector>
 #include <cstdint>
+#include <string>
 
 namespace Rainbow {
 	enum CommandType
@@ -91,4 +92,27 @@ namespace Rainbow {
 	void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
 	void BeginDraw(SwapChain* pSwapChain);
 	void EndDraw(SwapChain* pSwapChain);
+
+	enum ShaderStage
+	{
+		SHADER_STAGE_VERTEX  = 1,
+		SHADER_STAGE_PIXEL   = 2,
+		SHADER_STAGE_COMPUTE = 3,
+		SHADER_STAGE_MESH    = 4,
+	};
+
+	struct ShaderDesc {
+		ShaderStage mStages;
+		const char* pEntryPoint;
+	};
+
+	struct Shader {
+		ShaderStage mStages;
+		void* pByteCode;
+		uint32_t mByteCodeSize;
+	};
+
+	void CreateShaderFromFile(Device* pDevice, std::string file_path, ShaderDesc* pDesc, Shader** ppShader);
+	void CreateShaderFromString(Device* pDevice, std::string shader_string, ShaderDesc* pDesc, Shader** ppShader);
+	void RemoveShader(Shader* pShader);
 }
