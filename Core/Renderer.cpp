@@ -359,6 +359,10 @@ namespace Rainbow {
 	void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader) {
 	
 	}
-	void CreateShaderFromString(Device* pDevice, const char* shader_string, ShaderDesc* pDesc, Shader** ppShader) {}
-	void RemoveShader(Shader* pShader, bool force) {}
+	void CreateShaderFromString(Device* pDevice, const char* shader_string, ShaderDesc* pDesc, Shader** ppShader) {
+	
+	}
+	void RemoveShader(Shader* pShader, bool force) {
+	
+	}
 }
