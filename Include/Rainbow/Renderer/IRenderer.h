@@ -14,7 +14,7 @@
 #include <dxgi1_6.h>
 #include <vector>
 #include <cstdint>
-#include <dxcapi.h>
+
 
 namespace Rainbow {
 	enum CommandType
@@ -106,7 +106,7 @@ namespace Rainbow {
 
 	struct Shader {
 		ShaderStage mStages;
-		IDxcBlob* pBlob;
+		//IDxcBlob* pBlob;
 	};
 
 	RAINBOW_EXPORT void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader);
