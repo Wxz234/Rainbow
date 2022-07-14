@@ -8,6 +8,7 @@
 #include "../Include/Rainbow/Renderer/IRenderer.h"
 
 #include "../ThirdParty/dxc/dxcapi.h"
+#include "../ThirdParty/dxc/d3d12shader.h"
 
 #include <d3d12sdklayers.h>
 #include <combaseapi.h>
@@ -118,7 +119,6 @@ namespace Rainbow {
 
 		CreateQueue(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pQueue);
 		CreateCmd(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pCmd);
-
 
 		*ppDevice = pDevice;
 	}
@@ -324,6 +324,7 @@ namespace Rainbow {
 	}
 
 	void BeginDraw(SwapChain* pSwapChain) {
+		assert(pSwapChain);
 		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
 		CmdReset(pSwapChain->pCmdArray[frameIndex]);
 		Microsoft::WRL::ComPtr<ID3D12Resource> _res;
@@ -331,6 +332,7 @@ namespace Rainbow {
 		CmdResourceBarrier(pSwapChain->pCmdArray[frameIndex], _res.Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 	void EndDraw(SwapChain* pSwapChain) {
+		assert(pSwapChain);
 		auto frameIndex = pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex();
 		Microsoft::WRL::ComPtr<ID3D12Resource> _res;
 		pSwapChain->pDxSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&_res));
