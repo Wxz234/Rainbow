@@ -7,6 +7,8 @@
 
 #include "../Include/Rainbow/Renderer/IRenderer.h"
 
+#include "../ThirdParty/dxc/dxcapi.h"
+
 #include <d3d12sdklayers.h>
 #include <combaseapi.h>
 #include <wrl/client.h>
@@ -18,9 +20,6 @@
 #include <vector>
 
 #pragma warning(disable : 6031)
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
-#pragma comment(lib,"dxguid.lib")
 
 namespace Rainbow {
 
@@ -357,7 +356,9 @@ namespace Rainbow {
 		}
 	}
 
-	void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader) {}
+	void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader) {
+	
+	}
 	void CreateShaderFromString(Device* pDevice, const char* shader_string, ShaderDesc* pDesc, Shader** ppShader) {}
 	void RemoveShader(Shader* pShader, bool force) {}
 }

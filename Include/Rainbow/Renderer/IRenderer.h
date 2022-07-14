@@ -106,7 +106,6 @@ namespace Rainbow {
 
 	struct Shader {
 		ShaderStage mStages;
-		//IDxcBlob* pBlob;
 	};
 
 	RAINBOW_EXPORT void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader);
