@@ -420,9 +420,7 @@ namespace Rainbow {
 		Shader* pShader = new Shader;
 		*ppShader = pShader;
 	}
-	void CreateShaderFromString(Device* pDevice, const char* shader_string, ShaderDesc* pDesc, Shader** ppShader) {
-	
-	}
+
 	void RemoveShader(Shader* pShader, bool force) {
 	
 	}

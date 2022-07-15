@@ -110,6 +110,5 @@ namespace Rainbow {
 	};
 
 	RAINBOW_EXPORT void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader);
-	RAINBOW_EXPORT void CreateShaderFromString(Device* pDevice, const char* shader_string, ShaderDesc* pDesc, Shader** ppShader);
 	RAINBOW_EXPORT void RemoveShader(Shader* pShader,bool force = false);
 }
