@@ -5,8 +5,8 @@
 // https://github.com/Wxz234/Rainbow
 //
 
-#include "../Include/Rainbow/Window/Window.h"
-#include "../Include/Rainbow/Renderer/IRenderer.h"
+#include "../../Include/Rainbow/Window/Window.h"
+#include "../../Include/Rainbow/Renderer/IRenderer.h"
 
 #include <Windows.h>
 

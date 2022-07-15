@@ -11,7 +11,11 @@ set_property(TARGET dxc PROPERTY IMPORTED_IMPLIB C:/Users/42937/Documents/GitHub
 add_library(RainbowCore SHARED Core/Renderer.cpp Core/Window.cpp)
 target_compile_definitions(RainbowCore PRIVATE UNICODE _UNICODE RAINBOW_LIB)
 target_link_libraries(RainbowCore PRIVATE dxc d3d12.lib dxgi.lib dxguid.lib d3dcompiler.lib)
+add_custom_command(TARGET RainbowCore POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:RainbowCore> $<TARGET_FILE_DIR:RainbowCore>
+	COMMAND_EXPAND_LISTS
+)
 
-add_executable(RainbowEditor WIN32 Editor/Editor.cpp)
-target_compile_definitions(RainbowEditor PRIVATE UNICODE _UNICODE)
-target_link_libraries(RainbowEditor PRIVATE RainbowCore dxguid.lib)
+add_executable(RainbowDemo01_CreateWindow WIN32 Demo/CreateWindow/CreateWindow.cpp)
+target_compile_definitions(RainbowDemo01_CreateWindow PRIVATE UNICODE _UNICODE)
+target_link_libraries(RainbowDemo01_CreateWindow PRIVATE RainbowCore)

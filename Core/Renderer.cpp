@@ -19,6 +19,8 @@
 #include <WinBase.h>
 #include <cassert>
 #include <vector>
+#include <string>
+#include <filesystem>
 
 #pragma warning(disable : 6031)
 
@@ -48,6 +50,11 @@ namespace Rainbow {
 		p->QueryInterface(&_save);
 		auto pDevice = (Device*)device;
 		pDevice->mAllInterface.push_back(_save);
+	}
+
+	namespace _internal {
+		IDxcCompiler3* dxcCompiler = nullptr;
+		IDxcUtils* dxcUtils = nullptr;
 	}
 
 
@@ -120,6 +127,9 @@ namespace Rainbow {
 		CreateQueue(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pQueue);
 		CreateCmd(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pCmd);
 
+		DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&_internal::dxcUtils));
+		DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&_internal::dxcCompiler));
+
 		*ppDevice = pDevice;
 	}
 
@@ -135,6 +145,9 @@ namespace Rainbow {
 
 		pDevice->pDxDevice->Release();
 		pDevice->pDxActiveGPU->Release();
+
+		_internal::dxcUtils->Release();
+		_internal::dxcCompiler->Release();
 
 		delete pDevice;
 	}
@@ -359,7 +372,53 @@ namespace Rainbow {
 	}
 
 	void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader) {
-	
+		assert(pDevice);
+		assert(file_path);
+		assert(pDesc);
+		assert(ppShader);
+		
+		std::filesystem::path filepath{ file_path };
+		auto w_path = filepath.wstring();
+		std::filesystem::path entrypoint{ pDesc->pEntryPoint };
+		auto w_entrypoint = entrypoint.wstring();
+
+		std::wstring w_target;
+		switch (pDesc->mStages)
+		{
+			case SHADER_STAGE_VERTEX: w_target = L"vs_6_5"; break;
+			case SHADER_STAGE_PIXEL: w_target = L"ps_6_5"; break;
+			case SHADER_STAGE_COMPUTE: w_target = L"cs_6_5"; break;
+			case SHADER_STAGE_MESH: w_target = L"ms_6_5"; break;
+		}
+
+		Microsoft::WRL::ComPtr<IDxcBlobEncoding> pSource;
+		_internal::dxcUtils->LoadFile(w_path.c_str(), nullptr, &pSource);
+		DxcBuffer Source;
+		Source.Ptr = pSource->GetBufferPointer();
+		Source.Size = pSource->GetBufferSize();
+		Source.Encoding = DXC_CP_ACP;
+
+		LPCWSTR pszArgs[] =
+		{
+			w_path.c_str(),
+			L"-E", w_entrypoint.c_str(),
+			L"-T", w_target.c_str(),
+		};
+
+		Microsoft::WRL::ComPtr<IDxcIncludeHandler> pIncludeHandler;
+		_internal::dxcUtils->CreateDefaultIncludeHandler(&pIncludeHandler);
+
+		Microsoft::WRL::ComPtr<IDxcResult> pResults;
+		_internal::dxcCompiler->Compile(
+			&Source,               
+			pszArgs,               
+			5,      
+			pIncludeHandler.Get(),        
+			IID_PPV_ARGS(&pResults)
+		);
+		
+		Shader* pShader = new Shader;
+		*ppShader = pShader;
 	}
 	void CreateShaderFromString(Device* pDevice, const char* shader_string, ShaderDesc* pDesc, Shader** ppShader) {
 	
