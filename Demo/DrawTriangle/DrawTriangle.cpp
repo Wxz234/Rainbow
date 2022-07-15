@@ -15,6 +15,8 @@ constexpr uint32_t frameCount = 3;
 Rainbow::Window* pWindow = nullptr;
 Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
+Rainbow::Shader* pVSShader = nullptr;
+Rainbow::Shader* pPSShader = nullptr;
 
 void Draw() {
 	Rainbow::BeginDraw(pSwapChain);
@@ -57,9 +59,16 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::SwapChainDesc swapchainDesc{ pWindow->mWindowHandle, frameCount, w, h, DXGI_FORMAT_R8G8B8A8_UNORM };
 	Rainbow::CreateSwapChain(pDevice, &swapchainDesc, &pSwapChain);
 
+	Rainbow::ShaderDesc shaderDesc{ Rainbow::SHADER_STAGE_VERTEX ,"main" };
+	Rainbow::CreateShaderFromFile(pDevice, "Shader/02VertexShader.hlsl", &shaderDesc, &pVSShader);
+	shaderDesc.mStages = Rainbow::SHADER_STAGE_PIXEL;
+	Rainbow::CreateShaderFromFile(pDevice, "Shader/02PixelShader.hlsl", &shaderDesc, &pPSShader);
+
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
-	
+
+	Rainbow::RemoveShader(pVSShader);
+	Rainbow::RemoveShader(pPSShader);
 	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveDevice(pDevice);
 	Rainbow::RemoveRenderWindow(pWindow);

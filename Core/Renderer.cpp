@@ -168,10 +168,9 @@ namespace Rainbow {
 		}
 		pDevice->pDxDevice->CreateCommandAllocator(listDesc, IID_PPV_ARGS(&pCmd->pDxCmdAlloc));
 		pDevice->pDxDevice->CreateCommandList1(0, listDesc, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&pCmd->pDxCmdList));
-		pCmd->pDeviceRef = pDevice;
 
-		_Save(pCmd->pDeviceRef, pCmd->pDxCmdList);
-		_Save(pCmd->pDeviceRef, pCmd->pDxCmdAlloc);
+		_Save(pDevice, pCmd->pDxCmdList);
+		_Save(pDevice, pCmd->pDxCmdAlloc);
 		*ppCmd = pCmd;
 	}
 	void RemoveCmd(Cmd* pCmd, bool force) {
@@ -424,10 +423,17 @@ namespace Rainbow {
 		pShader->mStages = pDesc->mStages;
 		myShader->QueryInterface(&pShader->pBlob);
 
+		_Save(pDevice, pShader->pBlob);
+
 		*ppShader = pShader;
 	}
 
 	void RemoveShader(Shader* pShader, bool force) {
-	
+		assert(pShader);
+		if (force) {
+			_Erase(pShader->pDeviceRef, pShader->pBlob);
+		}
+		pShader->pBlob->Release();
+		delete pShader;
 	}
 }

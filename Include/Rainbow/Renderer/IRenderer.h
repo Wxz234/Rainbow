@@ -107,8 +107,16 @@ namespace Rainbow {
 	struct Shader {
 		ShaderStage mStages;
 		ID3DBlob* pBlob;
+
+		void* pDeviceRef;
 	};
 
 	RAINBOW_EXPORT void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader);
 	RAINBOW_EXPORT void RemoveShader(Shader* pShader,bool force = false);
+
+	struct Pipeline {
+		ID3D12PipelineState* pDxPipelineState;
+		ID3D12RootSignature* pDxRoot;
+		void* pDeviceRef;
+	};
 }
