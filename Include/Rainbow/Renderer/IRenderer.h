@@ -107,6 +107,7 @@ namespace Rainbow {
 	struct Shader {
 		ShaderStage mStages;
 		ID3DBlob* pBlob;
+		ID3DBlob* pReflectionData;
 
 		void* pDeviceRef;
 	};

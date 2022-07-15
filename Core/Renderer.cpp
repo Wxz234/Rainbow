@@ -402,6 +402,7 @@ namespace Rainbow {
 			w_path.c_str(),
 			L"-E", w_entrypoint.c_str(),
 			L"-T", w_target.c_str(),
+			L"-Qstrip_reflect"
 		};
 
 		Microsoft::WRL::ComPtr<IDxcIncludeHandler> pIncludeHandler;
@@ -411,19 +412,24 @@ namespace Rainbow {
 		_internal::dxcCompiler->Compile(
 			&Source,               
 			pszArgs,               
-			5,      
+			6,      
 			pIncludeHandler.Get(),        
 			IID_PPV_ARGS(&pResults)
 		);
-		Microsoft::WRL::ComPtr<IDxcBlob> myShader = nullptr;
-		Microsoft::WRL::ComPtr<IDxcBlobUtf16> pShaderName = nullptr;
+		Microsoft::WRL::ComPtr<IDxcBlob> myShader;
+		Microsoft::WRL::ComPtr<IDxcBlobUtf16> pShaderName;
 		pResults->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&myShader), &pShaderName);
 		
+		Microsoft::WRL::ComPtr<IDxcBlob> pReflectionData;
+		pResults->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(&pReflectionData), nullptr);
+
 		Shader* pShader = new Shader;
 		pShader->mStages = pDesc->mStages;
 		myShader->QueryInterface(&pShader->pBlob);
+		pReflectionData->QueryInterface(&pShader->pReflectionData);
 
 		_Save(pDevice, pShader->pBlob);
+		_Save(pDevice, pShader->pReflectionData);
 
 		*ppShader = pShader;
 	}
@@ -432,8 +438,10 @@ namespace Rainbow {
 		assert(pShader);
 		if (force) {
 			_Erase(pShader->pDeviceRef, pShader->pBlob);
+			_Erase(pShader->pDeviceRef, pShader->pReflectionData);
 		}
 		pShader->pBlob->Release();
+		pShader->pReflectionData->Release();
 		delete pShader;
 	}
 }
