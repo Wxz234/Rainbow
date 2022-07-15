@@ -416,8 +416,14 @@ namespace Rainbow {
 			pIncludeHandler.Get(),        
 			IID_PPV_ARGS(&pResults)
 		);
+		Microsoft::WRL::ComPtr<IDxcBlob> myShader = nullptr;
+		Microsoft::WRL::ComPtr<IDxcBlobUtf16> pShaderName = nullptr;
+		pResults->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&myShader), &pShaderName);
 		
 		Shader* pShader = new Shader;
+		pShader->mStages = pDesc->mStages;
+		myShader->QueryInterface(&pShader->pBlob);
+
 		*ppShader = pShader;
 	}
 

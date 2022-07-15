@@ -19,3 +19,7 @@ add_custom_command(TARGET RainbowCore POST_BUILD
 add_executable(RainbowDemo01_CreateWindow WIN32 Demo/CreateWindow/CreateWindow.cpp)
 target_compile_definitions(RainbowDemo01_CreateWindow PRIVATE UNICODE _UNICODE)
 target_link_libraries(RainbowDemo01_CreateWindow PRIVATE RainbowCore)
+
+add_executable(RainbowDemo02_DrawTriangle WIN32 Demo/DrawTriangle/DrawTriangle.cpp)
+target_compile_definitions(RainbowDemo02_DrawTriangle PRIVATE UNICODE _UNICODE)
+target_link_libraries(RainbowDemo02_DrawTriangle PRIVATE RainbowCore)
