@@ -64,11 +64,14 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::CreateShaderFromFile(pDevice, "Shader/02VertexShader.hlsl", &shaderDesc, &pVSShader);
 	shaderDesc.mStages = Rainbow::SHADER_STAGE_PIXEL;
 	Rainbow::CreateShaderFromFile(pDevice, "Shader/02PixelShader.hlsl", &shaderDesc, &pPSShader);
+	Rainbow::Cmd* ppcmd;
+	Rainbow::CreateCmd(pDevice, Rainbow::COMMAND_TYPE_GRAPHICS, &ppcmd);
+	Rainbow::RemoveCmd(ppcmd, true);
 
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
 
-	Rainbow::RemoveShader(pVSShader);
+	Rainbow::RemoveShader(pVSShader,true);
 	Rainbow::RemoveShader(pPSShader);
 	Rainbow::RemoveSwapChain(pSwapChain);
 	Rainbow::RemoveDevice(pDevice);

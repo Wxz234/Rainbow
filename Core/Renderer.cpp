@@ -174,6 +174,7 @@ namespace Rainbow {
 		pDevice->pDxDevice->CreateCommandAllocator(listDesc, IID_PPV_ARGS(&pCmd->pDxCmdAlloc));
 		pDevice->pDxDevice->CreateCommandList1(0, listDesc, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&pCmd->pDxCmdList));
 
+		pCmd->pDeviceRef = pDevice;
 		_Save(pDevice, pCmd->pDxCmdList);
 		_Save(pDevice, pCmd->pDxCmdAlloc);
 		*ppCmd = pCmd;
@@ -211,8 +212,8 @@ namespace Rainbow {
 		pDevice->pDxDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pQueue->pDxFence));
 		pQueue->pDxWaitIdleFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 		pQueue->mFenceValue = 1;
-		pQueue->pDeviceRef = pDevice;
 
+		pQueue->pDeviceRef = pDevice;
 		_Save(pQueue->pDeviceRef, pQueue->pDxQueue);
 		_Save(pQueue->pDeviceRef, pQueue->pDxFence);
 
@@ -433,6 +434,7 @@ namespace Rainbow {
 		myShader->QueryInterface(&pShader->pBlob);
 		pReflectionData->QueryInterface(&pShader->pReflectionData);
 
+		pShader->pDeviceRef = pDevice;
 		_Save(pDevice, pShader->pBlob);
 		_Save(pDevice, pShader->pReflectionData);
 
@@ -457,6 +459,40 @@ namespace Rainbow {
 
 		Pipeline* pPipeline = new Pipeline;
 
+
+		pPipeline->pDeviceRef = pDevice;
+		_Save(pDevice, pPipeline->pDxPipelineState);
 		*ppPipeline = pPipeline;
+	}
+
+	void RemovePipeline(Pipeline* pPipeline, bool force) {
+		assert(pPipeline);
+		if (force) {
+			_Erase(pPipeline->pDeviceRef, pPipeline->pDxPipelineState);
+		}
+		pPipeline->pDxPipelineState->Release();
+		delete pPipeline;
+	}
+
+	void CreateRootSignatureFromShader(Device* pDevice, Shader* pShader, RootSignature** ppRootSignature) {
+		assert(pDevice);
+		assert(pShader);
+		assert(ppRootSignature);
+
+		RootSignature* myRootSignature = new RootSignature;
+		pDevice->pDxDevice->CreateRootSignature(0, pShader->pBlob->GetBufferPointer(), pShader->pBlob->GetBufferSize(), IID_PPV_ARGS(&myRootSignature->pRootSignature));
+
+		myRootSignature->pDeviceRef = pDevice;
+		_Save(pDevice, myRootSignature->pRootSignature);
+		*ppRootSignature = myRootSignature;
+	}
+
+	void RemoveRootSignature(RootSignature* pRootSignature, bool force) {
+		assert(pRootSignature);
+		if (force) {
+			_Erase(pRootSignature->pDeviceRef, pRootSignature->pRootSignature);
+		}
+		pRootSignature->pRootSignature->Release();
+		delete pRootSignature;
 	}
 }

@@ -113,14 +113,18 @@ namespace Rainbow {
 	};
 
 	RAINBOW_EXPORT void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader);
-	RAINBOW_EXPORT void RemoveShader(Shader* pShader,bool force = false);
+	RAINBOW_EXPORT void RemoveShader(Shader* pShader, bool force = false);
 
 	struct RootSignature {
 		ID3D12RootSignature* pRootSignature;
+		void* pDeviceRef;
 	};
 
+	RAINBOW_EXPORT void CreateRootSignatureFromShader(Device* pDevice, Shader* pShader, RootSignature** ppRootSignature);
+	RAINBOW_EXPORT void RemoveRootSignature(RootSignature* pRootSignature, bool force = false);
+
 	struct GraphicsPipelineDesc {
-		ID3D12RootSignature* pRootSignature;
+		RootSignature* pRootSignature;
 		Shader* VS;
 		Shader* PS;
 		D3D12_BLEND_DESC BlendState;
@@ -135,9 +139,9 @@ namespace Rainbow {
 
 	struct Pipeline {
 		ID3D12PipelineState* pDxPipelineState;
-		ID3D12RootSignature* pRootSignature;
+		RootSignature* pRootSignature;
 		void* pDeviceRef;
 	};
 	RAINBOW_EXPORT void CreatePipeline(Device* pDevice, GraphicsPipelineDesc* pDesc, Pipeline** ppPipeline);
-
+	RAINBOW_EXPORT void RemovePipeline(Pipeline* pPipeline, bool force = false);
 }
