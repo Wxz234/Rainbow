@@ -115,9 +115,29 @@ namespace Rainbow {
 	RAINBOW_EXPORT void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader);
 	RAINBOW_EXPORT void RemoveShader(Shader* pShader,bool force = false);
 
+	struct RootSignature {
+		ID3D12RootSignature* pRootSignature;
+	};
+
+	struct GraphicsPipelineDesc {
+		ID3D12RootSignature* pRootSignature;
+		Shader* VS;
+		Shader* PS;
+		D3D12_BLEND_DESC BlendState;
+		UINT SampleMask;
+		D3D12_RASTERIZER_DESC RasterizerState;
+		D3D12_DEPTH_STENCIL_DESC DepthStencilState;
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveTopologyType;
+		UINT NumRenderTargets;
+		DXGI_FORMAT RTVFormats[8];
+		DXGI_FORMAT DSVFormat;
+	};
+
 	struct Pipeline {
 		ID3D12PipelineState* pDxPipelineState;
-		ID3D12RootSignature* pDxRoot;
+		ID3D12RootSignature* pRootSignature;
 		void* pDeviceRef;
 	};
+	RAINBOW_EXPORT void CreatePipeline(Device* pDevice, GraphicsPipelineDesc* pDesc, Pipeline** ppPipeline);
+
 }

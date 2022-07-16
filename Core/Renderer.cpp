@@ -127,8 +127,14 @@ namespace Rainbow {
 		CreateQueue(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pQueue);
 		CreateCmd(pDevice, COMMAND_TYPE_GRAPHICS, &pDevice->pCmd);
 
-		DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&_internal::dxcUtils));
-		DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&_internal::dxcCompiler));
+		if (!_internal::dxcUtils && !_internal::dxcCompiler) {
+			DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&_internal::dxcUtils));
+			DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&_internal::dxcCompiler));
+		}
+		else {
+			_internal::dxcUtils->AddRef();
+			_internal::dxcCompiler->AddRef();
+		}
 
 		*ppDevice = pDevice;
 	}
@@ -148,7 +154,6 @@ namespace Rainbow {
 
 		_internal::dxcUtils->Release();
 		_internal::dxcCompiler->Release();
-
 		delete pDevice;
 	}
 
@@ -443,5 +448,15 @@ namespace Rainbow {
 		pShader->pBlob->Release();
 		pShader->pReflectionData->Release();
 		delete pShader;
+	}
+
+	void CreatePipeline(Device* pDevice, GraphicsPipelineDesc* pDesc, Pipeline** ppPipeline) {
+		assert(pDevice);
+		assert(pDesc);
+		assert(ppPipeline);
+
+		Pipeline* pPipeline = new Pipeline;
+
+		*ppPipeline = pPipeline;
 	}
 }

@@ -17,6 +17,7 @@ Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
 Rainbow::Shader* pVSShader = nullptr;
 Rainbow::Shader* pPSShader = nullptr;
+ID3D12PipelineState* pPipeline = nullptr;
 
 void Draw() {
 	Rainbow::BeginDraw(pSwapChain);
