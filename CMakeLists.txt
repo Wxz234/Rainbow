@@ -28,3 +28,6 @@ add_executable(RainbowDemo02_DrawTriangle WIN32 Demo/DrawTriangle/DrawTriangle.c
 target_compile_definitions(RainbowDemo02_DrawTriangle PRIVATE UNICODE _UNICODE)
 target_link_libraries(RainbowDemo02_DrawTriangle PRIVATE RainbowCore)
 set_target_properties(RainbowDemo02_DrawTriangle PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/Demo/DrawTriangle")
+add_custom_command(TARGET RainbowDemo02_DrawTriangle PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/Demo/DrawTriangle/Shader" $<TARGET_FILE_DIR:RainbowDemo02_DrawTriangle>/Shader
+)
