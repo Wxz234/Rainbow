@@ -7,6 +7,6 @@ struct VS_OUTPUT {
 VS_OUTPUT main(uint VertexID : SV_VertexID) {
 	VS_OUTPUT Out;
 	Out.TEX = float2((VertexID << 1) & 2, VertexID & 2);
-	Out.POSITION = float4(Out.TEX * float2(2.0f, -2.0f) + float2(-1.0f, 1.0f), 0.0f, 1.0f);
+	Out.POSITION = float4(Out.TEX * float2(0.5f, -0.5f) + float2(-0.5f, 0.5f), 0.0f, 1.0f);
 	return Out;
 }

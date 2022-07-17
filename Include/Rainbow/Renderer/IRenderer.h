@@ -90,6 +90,7 @@ namespace Rainbow {
 	RAINBOW_EXPORT void SwapChainResize(SwapChain* pSwapChain, uint32_t width, uint32_t height, DXGI_FORMAT format);
 	RAINBOW_EXPORT void BeginDraw(SwapChain* pSwapChain);
 	RAINBOW_EXPORT void EndDraw(SwapChain* pSwapChain);
+	RAINBOW_EXPORT ID3D12GraphicsCommandList* GetActiveCommandList(SwapChain* pSwapChain);
 
 	enum ShaderStage
 	{
@@ -130,24 +131,9 @@ namespace Rainbow {
 		PIPELINE_TYPE_COUNT,
 	};
 
-	struct GraphicsPipelineDesc {
-		RootSignature* pRootSignature;
-		Shader* VS;
-		Shader* PS;
-		D3D12_BLEND_DESC BlendState;
-		UINT SampleMask;
-		D3D12_RASTERIZER_DESC RasterizerState;
-		D3D12_DEPTH_STENCIL_DESC DepthStencilState;
-		D3D12_INPUT_LAYOUT_DESC InputLayout;
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveTopologyType;
-		UINT NumRenderTargets;
-		DXGI_FORMAT RTVFormats[8];
-		DXGI_FORMAT DSVFormat;
-	};
-
 	struct Pipeline {
 		ID3D12PipelineState* pDxPipelineState;
-		RootSignature* pRootSignature;
+		ID3D12RootSignature* pRootSignature;
 		PipelineType mType;
 		void* pDeviceRef;
 	};
@@ -185,8 +171,6 @@ namespace Rainbow {
 		return temp;
 	}
 
-	RAINBOW_EXPORT void CreatePipeline(Device* pDevice, GraphicsPipelineDesc* pDesc, Pipeline** ppPipeline);
+	RAINBOW_EXPORT void CreatePipeline(Device* pDevice, D3D12_GRAPHICS_PIPELINE_STATE_DESC* pDesc, Pipeline** ppPipeline);
 	RAINBOW_EXPORT void RemovePipeline(Pipeline* pPipeline, bool force = false);
-
-	RAINBOW_EXPORT void CmdSetPipeline(Cmd* pCmd, Pipeline* pPipeline);
 }

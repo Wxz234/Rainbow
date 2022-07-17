@@ -9,6 +9,7 @@
 #include "../../Include/Rainbow/Renderer/IRenderer.h"
 
 #include <Windows.h>
+#include <d3d12.h>
 
 uint32_t w = 1024, h = 768;
 constexpr uint32_t frameCount = 3;
@@ -22,13 +23,19 @@ Rainbow::Pipeline* pPipeline = nullptr;
 
 void Draw() {
 	Rainbow::BeginDraw(pSwapChain);
-	//auto 
-	//m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+	auto m_commandList = Rainbow::GetActiveCommandList(pSwapChain);
+	m_commandList->SetPipelineState(pPipeline->pDxPipelineState);
+	m_commandList->SetGraphicsRootSignature(pPipeline->pRootSignature);
+	D3D12_VIEWPORT m_viewport(0.0F, 0.0F, (float)w, float(h), D3D12_MIN_DEPTH, D3D12_MAX_DEPTH);
+	m_commandList->RSSetViewports(1, &m_viewport);
+	D3D12_RECT m_rect{ 0,0,w,h };
+	m_commandList->RSSetScissorRects(1, &m_rect);
+	m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//// Record commands.
-	//const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
-	//m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-	//m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = pSwapChain->pDxRTVHeap->GetCPUDescriptorHandleForHeapStart();
+	rtvHandle.ptr += pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex() * pSwapChain->mDescriptorSize;
+	m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+	m_commandList->DrawInstanced(3, 1, 0, 0);
 	Rainbow::EndDraw(pSwapChain);
 }
 
@@ -74,21 +81,19 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::CreateShaderFromFile(pDevice, "Shader/02PixelShader.hlsl", &shaderDesc, &pPSShader);
 
 	Rainbow::CreateRootSignatureFromShader(pDevice, pVSShader, &pRoot);
-	Rainbow::GraphicsPipelineDesc gDesc{
-		pRoot,
-		pVSShader,
-		pPSShader,
-		Rainbow::GetDefaultBlendState(),
-		0xffffffff,
-		Rainbow::GetDefaultRasterizerState(),
-		{},
-		{},
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-		1,
-		{ DXGI_FORMAT_R8G8B8A8_UNORM },
-		DXGI_FORMAT_UNKNOWN
-	};
-	Rainbow::CreatePipeline(pDevice, &gDesc, &pPipeline);
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+	psoDesc.InputLayout = { 0,0 };
+	psoDesc.pRootSignature = pRoot->pRootSignature;
+	psoDesc.VS = { pVSShader->pBlob->GetBufferPointer(), pVSShader->pBlob->GetBufferSize() };
+	psoDesc.PS = { pPSShader->pBlob->GetBufferPointer(), pPSShader->pBlob->GetBufferSize() };
+	psoDesc.RasterizerState = Rainbow::GetDefaultRasterizerState();
+	psoDesc.BlendState = Rainbow::GetDefaultBlendState();
+	psoDesc.SampleMask = UINT_MAX;
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	psoDesc.NumRenderTargets = 1;
+	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	psoDesc.SampleDesc.Count = 1;
+	Rainbow::CreatePipeline(pDevice, &psoDesc, &pPipeline);
 
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
