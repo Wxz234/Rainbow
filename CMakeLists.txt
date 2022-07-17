@@ -16,6 +16,10 @@ add_custom_command(TARGET RainbowCore POST_BUILD
 	COMMAND_EXPAND_LISTS
 )
 
+add_custom_command(TARGET RainbowCore POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/ThirdParty/dxc/dxil.dll" $<TARGET_FILE_DIR:RainbowCore>
+)
+
 add_executable(RainbowDemo01_CreateWindow WIN32 Demo/CreateWindow/CreateWindow.cpp)
 target_compile_definitions(RainbowDemo01_CreateWindow PRIVATE UNICODE _UNICODE)
 target_link_libraries(RainbowDemo01_CreateWindow PRIVATE RainbowCore)

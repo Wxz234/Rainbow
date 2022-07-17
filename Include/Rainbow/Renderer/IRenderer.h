@@ -123,6 +123,13 @@ namespace Rainbow {
 	RAINBOW_EXPORT void CreateRootSignatureFromShader(Device* pDevice, Shader* pShader, RootSignature** ppRootSignature);
 	RAINBOW_EXPORT void RemoveRootSignature(RootSignature* pRootSignature, bool force = false);
 
+	enum PipelineType
+	{
+		PIPELINE_TYPE_GRAPHICS = 0,
+		PIPELINE_TYPE_COMPUTE,
+		PIPELINE_TYPE_COUNT,
+	};
+
 	struct GraphicsPipelineDesc {
 		RootSignature* pRootSignature;
 		Shader* VS;
@@ -131,6 +138,7 @@ namespace Rainbow {
 		UINT SampleMask;
 		D3D12_RASTERIZER_DESC RasterizerState;
 		D3D12_DEPTH_STENCIL_DESC DepthStencilState;
+		D3D12_INPUT_LAYOUT_DESC InputLayout;
 		D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveTopologyType;
 		UINT NumRenderTargets;
 		DXGI_FORMAT RTVFormats[8];
@@ -140,8 +148,45 @@ namespace Rainbow {
 	struct Pipeline {
 		ID3D12PipelineState* pDxPipelineState;
 		RootSignature* pRootSignature;
+		PipelineType mType;
 		void* pDeviceRef;
 	};
+
+	inline D3D12_BLEND_DESC GetDefaultBlendState() {
+		D3D12_BLEND_DESC temp{};
+		temp.AlphaToCoverageEnable = FALSE;
+		temp.IndependentBlendEnable = FALSE;
+		const D3D12_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
+		{
+			FALSE,FALSE,
+			D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+			D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+			D3D12_LOGIC_OP_NOOP,
+			D3D12_COLOR_WRITE_ENABLE_ALL,
+		};
+		for (UINT i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+			temp.RenderTarget[i] = defaultRenderTargetBlendDesc;
+
+		return temp;
+	}
+	inline D3D12_RASTERIZER_DESC GetDefaultRasterizerState() {
+		D3D12_RASTERIZER_DESC temp{};
+		temp.FillMode = D3D12_FILL_MODE_SOLID;
+		temp.CullMode = D3D12_CULL_MODE_BACK;
+		temp.FrontCounterClockwise = FALSE;
+		temp.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+		temp.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+		temp.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+		temp.DepthClipEnable = TRUE;
+		temp.MultisampleEnable = FALSE;
+		temp.AntialiasedLineEnable = FALSE;
+		temp.ForcedSampleCount = 0;
+		temp.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+		return temp;
+	}
+
 	RAINBOW_EXPORT void CreatePipeline(Device* pDevice, GraphicsPipelineDesc* pDesc, Pipeline** ppPipeline);
 	RAINBOW_EXPORT void RemovePipeline(Pipeline* pPipeline, bool force = false);
+
+	RAINBOW_EXPORT void CmdSetPipeline(Cmd* pCmd, Pipeline* pPipeline);
 }

@@ -17,10 +17,18 @@ Rainbow::Device* pDevice = nullptr;
 Rainbow::SwapChain* pSwapChain = nullptr;
 Rainbow::Shader* pVSShader = nullptr;
 Rainbow::Shader* pPSShader = nullptr;
-ID3D12PipelineState* pPipeline = nullptr;
+Rainbow::RootSignature* pRoot = nullptr;
+Rainbow::Pipeline* pPipeline = nullptr;
 
 void Draw() {
 	Rainbow::BeginDraw(pSwapChain);
+	//auto 
+	//m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+
+	//// Record commands.
+	//const float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	//m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+	//m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	Rainbow::EndDraw(pSwapChain);
 }
 
@@ -64,16 +72,32 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPreInstance, _
 	Rainbow::CreateShaderFromFile(pDevice, "Shader/02VertexShader.hlsl", &shaderDesc, &pVSShader);
 	shaderDesc.mStages = Rainbow::SHADER_STAGE_PIXEL;
 	Rainbow::CreateShaderFromFile(pDevice, "Shader/02PixelShader.hlsl", &shaderDesc, &pPSShader);
-	Rainbow::Cmd* ppcmd;
-	Rainbow::CreateCmd(pDevice, Rainbow::COMMAND_TYPE_GRAPHICS, &ppcmd);
-	Rainbow::RemoveCmd(ppcmd, true);
+
+	Rainbow::CreateRootSignatureFromShader(pDevice, pVSShader, &pRoot);
+	Rainbow::GraphicsPipelineDesc gDesc{
+		pRoot,
+		pVSShader,
+		pPSShader,
+		Rainbow::GetDefaultBlendState(),
+		0xffffffff,
+		Rainbow::GetDefaultRasterizerState(),
+		{},
+		{},
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+		1,
+		{ DXGI_FORMAT_R8G8B8A8_UNORM },
+		DXGI_FORMAT_UNKNOWN
+	};
+	Rainbow::CreatePipeline(pDevice, &gDesc, &pPipeline);
 
 	Rainbow::RenderWindowShow(pWindow);
 	Rainbow::RenderWindowRunLoop(pWindow, Draw);
 
+	Rainbow::RemovePipeline(pPipeline, true);
+	Rainbow::RemoveRootSignature(pRoot, true);
 	Rainbow::RemoveShader(pVSShader,true);
-	Rainbow::RemoveShader(pPSShader);
-	Rainbow::RemoveSwapChain(pSwapChain);
+	Rainbow::RemoveShader(pPSShader,true);
+	Rainbow::RemoveSwapChain(pSwapChain, true);
 	Rainbow::RemoveDevice(pDevice);
 	Rainbow::RemoveRenderWindow(pWindow);
 	return 0;

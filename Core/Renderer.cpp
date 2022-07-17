@@ -142,7 +142,7 @@ namespace Rainbow {
 	void RemoveDevice(Device* pDevice) {
 		assert(pDevice);
 		RemoveQueue(pDevice->pQueue, true);
-		RemoveCmd(pDevice->pCmd, false);
+		RemoveCmd(pDevice->pCmd, true);
 
 		for (auto& ptr : pDevice->mAllInterface) {
 			auto refCount = ptr->Release();
@@ -458,7 +458,27 @@ namespace Rainbow {
 		assert(ppPipeline);
 
 		Pipeline* pPipeline = new Pipeline;
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC gDesc{};
+		gDesc.pRootSignature = pDesc->pRootSignature->pRootSignature;
+		gDesc.VS = { pDesc->VS->pBlob->GetBufferPointer(),pDesc->VS->pBlob->GetBufferSize() };
+		gDesc.PS = { pDesc->PS->pBlob->GetBufferPointer(),pDesc->PS->pBlob->GetBufferSize() };
 
+		gDesc.BlendState = pDesc->BlendState;
+		gDesc.SampleMask = pDesc->SampleMask;
+		gDesc.RasterizerState = pDesc->RasterizerState;
+		gDesc.DepthStencilState = pDesc->DepthStencilState;
+		gDesc.PrimitiveTopologyType = pDesc->PrimitiveTopologyType;
+		gDesc.NumRenderTargets = pDesc->NumRenderTargets;
+		for (UINT i = 0; i < gDesc.NumRenderTargets; ++i) {
+			gDesc.RTVFormats[i] = pDesc->RTVFormats[i];
+		}
+		gDesc.DSVFormat = pDesc->DSVFormat;
+		gDesc.SampleDesc = { 1,0 };
+		gDesc.InputLayout = pDesc->InputLayout;
+
+		pDevice->pDxDevice->CreateGraphicsPipelineState(&gDesc, IID_PPV_ARGS(&pPipeline->pDxPipelineState));
+		pPipeline->pRootSignature = pDesc->pRootSignature;
+		pPipeline->mType = PIPELINE_TYPE_GRAPHICS;
 
 		pPipeline->pDeviceRef = pDevice;
 		_Save(pDevice, pPipeline->pDxPipelineState);
@@ -494,5 +514,12 @@ namespace Rainbow {
 		}
 		pRootSignature->pRootSignature->Release();
 		delete pRootSignature;
+	}
+
+	void CmdSetPipeline(Cmd* pCmd, Pipeline* pPipeline) {
+		if (pPipeline->mType == PIPELINE_TYPE_GRAPHICS) {
+			pCmd->pDxCmdList->SetPipelineState(pPipeline->pDxPipelineState);
+			pCmd->pDxCmdList->SetGraphicsRootSignature(pPipeline->pRootSignature->pRootSignature);
+		}
 	}
 }
