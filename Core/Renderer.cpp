@@ -381,6 +381,12 @@ namespace Rainbow {
 		return pSwapChain->pCmdArray[frameIndex]->pDxCmdList;
 	}
 
+	D3D12_CPU_DESCRIPTOR_HANDLE GetActiveRTV(SwapChain* pSwapChain) {
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = pSwapChain->pDxRTVHeap->GetCPUDescriptorHandleForHeapStart();
+		rtvHandle.ptr += pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex() * pSwapChain->mDescriptorSize;
+		return rtvHandle;
+	}
+
 	void CreateShaderFromFile(Device* pDevice, const char* file_path, ShaderDesc* pDesc, Shader** ppShader) {
 		assert(pDevice);
 		assert(file_path);

@@ -32,8 +32,7 @@ void Draw() {
 	m_commandList->RSSetScissorRects(1, &m_rect);
 	m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = pSwapChain->pDxRTVHeap->GetCPUDescriptorHandleForHeapStart();
-	rtvHandle.ptr += pSwapChain->pDxSwapChain->GetCurrentBackBufferIndex() * pSwapChain->mDescriptorSize;
+	auto rtvHandle = GetActiveRTV(pSwapChain);
 	m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 	m_commandList->DrawInstanced(3, 1, 0, 0);
 	Rainbow::EndDraw(pSwapChain);

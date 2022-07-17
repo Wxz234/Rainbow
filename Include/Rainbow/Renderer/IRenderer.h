@@ -91,6 +91,7 @@ namespace Rainbow {
 	RAINBOW_EXPORT void BeginDraw(SwapChain* pSwapChain);
 	RAINBOW_EXPORT void EndDraw(SwapChain* pSwapChain);
 	RAINBOW_EXPORT ID3D12GraphicsCommandList* GetActiveCommandList(SwapChain* pSwapChain);
+	RAINBOW_EXPORT D3D12_CPU_DESCRIPTOR_HANDLE GetActiveRTV(SwapChain* pSwapChain);
 
 	enum ShaderStage
 	{
